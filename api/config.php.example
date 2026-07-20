@@ -1,0 +1,8 @@
+<?php
+// Шаблон конфига для api/lead.php.
+// На сервере: cp api/config.php.example api/config.php и заполнить значения.
+// api/config.php в .gitignore — в репо не коммитится.
+
+// TODO: токен бота заявок «Венеции» (@BotFather) и chat_id группы заявок.
+define('TELEGRAM_BOT_TOKEN', 'PUT-YOUR-BOT-TOKEN-HERE');
+define('TELEGRAM_CHAT_ID',  'PUT-CHAT-ID-HERE');

@@ -1,0 +1,14 @@
+# «Венеция» — корневой .htaccess (деплоится на хостинг).
+AddDefaultCharset UTF-8
+ErrorDocument 404 /404.html
+
+# Кэширование статики
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/webp  "access plus 30 days"
+  ExpiresByType image/png   "access plus 30 days"
+  ExpiresByType image/x-icon "access plus 30 days"
+  ExpiresByType image/svg+xml "access plus 30 days"
+  ExpiresByType text/css    "access plus 7 days"
+  ExpiresByType application/javascript "access plus 7 days"
+</IfModule>

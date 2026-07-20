@@ -1,0 +1,21 @@
+# Прячем конфиг с токеном от прямого скачивания через браузер.
+# PHP-файлы Apache всё равно исполняет, а не отдаёт как текст,
+# но это страховка на случай, если PHP-обработчик упадёт.
+<Files "config.php">
+    Require all denied
+</Files>
+<Files "config.php.example">
+    Require all denied
+</Files>
+
+# Старый синтаксис для Apache 2.2 (на случай если хостинг там).
+<IfModule !mod_authz_core.c>
+    <Files "config.php">
+        Order allow,deny
+        Deny from all
+    </Files>
+    <Files "config.php.example">
+        Order allow,deny
+        Deny from all
+    </Files>
+</IfModule>

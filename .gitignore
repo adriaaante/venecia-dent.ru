@@ -1,0 +1,8 @@
+# Токен Telegram-бота живёт только на сервере
+api/config.php
+
+# Служебное
+.DS_Store
+Thumbs.db
+*.pyc
+__pycache__/
