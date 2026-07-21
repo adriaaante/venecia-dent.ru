@@ -1,5 +1,12 @@
 User-agent: *
 Allow: /
+
+# Служебное — не индексировать
 Disallow: /api/
+Disallow: /404.html
+
+# Склейка адресов с рекламными метками (директива Яндекса; Google
+# игнорирует — там дубли закрывает rel="canonical" на страницах).
+Clean-param: utm_source&utm_medium&utm_campaign&utm_term&utm_content&yclid&gclid
 
 Sitemap: https://venecia-dent.ru/sitemap.xml
