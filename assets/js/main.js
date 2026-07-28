@@ -251,7 +251,7 @@
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if ('IntersectionObserver' in window && !reduceMotion) {
     var revealTargets = document.querySelectorAll(
-      '.section h2, .section__lead, .service-card, .step, .usp, .faq__item, .related__card, .prices-table, .reviews-empty, .clinic-gallery img'
+      '.section h2, .section__lead, .service-card, .step, .usp, .faq__item, .related__card, .prices-table, .reviews-empty, .clinic-gallery img, .doctor-card, .pf-card'
     );
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
