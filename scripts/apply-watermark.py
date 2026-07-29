@@ -24,13 +24,16 @@ SRC_DIR = ROOT / "assets" / "img" / "portfolio" / "_originals"
 OUT_DIR = ROOT / "assets" / "img" / "portfolio"
 WM_PATH = ROOT / "assets" / "img" / "watermark.png"
 
-WM_WIDTH_RATIO = 0.32  # watermark width as fraction of image width
+# Знак Венеции — плотная плашка-логотип (в отличие от лёгкой линейной
+# графики Angel/Versal), поэтому он меньше и прозрачнее: при 32%/78%
+# перетягивал внимание с клинического фото. Ниже 20%/45% зуб перестаёт
+# читаться и знак превращается в мутный квадрат — не опускать.
+WM_WIDTH_RATIO = 0.24  # watermark width as fraction of image width
 WM_MARGIN_RATIO = 0.03
-WM_OPACITY = 0.78
-# Сам знак светло-голубой и на белых зубных снимках почти теряется.
-# Подкладываем под него мягкий тёмный halo, чтобы оставался читаемым
+WM_OPACITY = 0.62
+# Под знаком мягкий тёмный halo, чтобы он оставался читаемым
 # и на белом, и на тёмном фоне.
-SHADOW_OPACITY = 0.55
+SHADOW_OPACITY = 0.38
 SHADOW_BLUR_RATIO = 0.014  # радиус блюра как доля от ширины знака
 
 
