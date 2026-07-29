@@ -165,13 +165,39 @@ Telegram. Honeypot `company`, маска `+7 (XXX) XXX-XX-XX`. Цели
 
 ## Деплой на reg.ru
 
-С сервера (Shell-клиент ISPmanager): `scripts/deploy.sh` = git pull +
-rsync репо → `~/www/venecia-dent.ru/`. Ярлык: `ln -s
-~/venecia-dent.ru/scripts/deploy.sh ~/venecia-dent.sh`. На сервере ТРИ
-клиники (Angel, Versal, Венеция) — у каждой свой репо/папка/ярлык, не
-перепутать. Не деплоятся: .git, scripts/, CLAUDE.md, README.md, BRAND.md,
-_materials/, api/config.php.example. Первичный сетап: клонировать репо в
-`~/venecia-dent.ru/`, создать `api/config.php`, симлинк, `--dry`, деплой.
+✅ **Сайт развёрнут и работает с 29.07.2026** — https://venecia-dent.ru/
+отдаётся по https, всё проверено (страницы 200, редиректы, gzip).
+
+С сервера (Shell-клиент ISPmanager): `~/venecia-dent.sh` = `git pull` +
+rsync репо → `~/www/venecia-dent.ru/`. На сервере ТРИ клиники (Angel,
+Versal, Венеция) — у каждой свой репо/папка/ярлык, не перепутать.
+Не деплоятся: .git, scripts/, CLAUDE.md, README.md, BRAND.md,
+_materials/, api/config.php.example, `assets/img/portfolio/_originals/`.
+
+Что уже сделано на сервере (повторять не надо):
+- репо склонирован в `~/venecia-dent.ru/`, **ветка `main`**;
+- `api/config.php` создан из `.example` — **пока с заглушкой вместо
+  токена**, заявки в Telegram не уходят (см. TODO);
+- симлинк `~/venecia-dent.sh → ~/venecia-dent.ru/scripts/deploy.sh`;
+- публичная папка `~/www/venecia-dent.ru/`.
+
+**DNS/хостинг:** домен на NS `ns1/ns2.hosting.reg.ru`, A-записи `@` и
+`www` → `31.31.197.39` (тот же сервер, что у Angel/Versal). При
+подключении домена делегирование в зоне `.RU` обновлялось ~1 час — всё
+это время домен резолвился на парковку `95.163.244.138`, и выпуск
+Let's Encrypt падал с 404 на `/.well-known/acme-challenge/`. Если
+повторится с другим доменом: проверять `dig NS <домен>
+@a.dns.ripn.net +noall +authority` (истинное делегирование, без кешей)
+и `dig +short A <домен> @1.1.1.1`; `whois` показывает новые NS раньше,
+чем зона `.RU` их публикует. Ждать, не тратя попытки LE (лимит —
+5 неудачных проверок на домен в час).
+
+**SSL:** сертификат Let's Encrypt (`venecia-dent.ru_le1`) на
+`venecia-dent.ru` + `www`, выпускается в ISPmanager → SSL-сертификаты.
+Редирект на https и склейка www — **в `.htaccess` репозитория**
+(как у Angel/Versal), галочку редиректа в панели не включать.
+⚠️ `.htaccess` гонит на https безусловно — до выпуска сертификата
+на новом домене его деплоить нельзя.
 
 ## Workflow пушей
 
