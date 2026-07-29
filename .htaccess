@@ -2,13 +2,41 @@
 AddDefaultCharset UTF-8
 ErrorDocument 404 /404.html
 
-# Кэширование статики
+# --- Канонический хост: только https и без www (единый 301) ---
+# Убирает дубли http/https и www/non-www (важно для Яндекса и склейки веса).
+# Проверка X-Forwarded-Proto — чтобы не зациклиться за SSL-прокси reg.ru.
+# ⚠️ Работает только когда на домене выпущен валидный SSL-сертификат.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # www.venecia-dent.ru → venecia-dent.ru (сразу на https)
+    RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+    RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+    # http → https
+    RewriteCond %{HTTPS} off
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# --- Сжатие (gzip) ---
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/xml application/xml \
+        application/javascript application/json image/svg+xml
+</IfModule>
+
+# --- Кэширование статики ---
+# Без хэшей в именах файлов, поэтому css/js кэшируем умеренно (7 дней),
+# изображения — 30 дней, html — 1 час.
 <IfModule mod_expires.c>
-  ExpiresActive On
-  ExpiresByType image/webp  "access plus 30 days"
-  ExpiresByType image/png   "access plus 30 days"
-  ExpiresByType image/x-icon "access plus 30 days"
-  ExpiresByType image/svg+xml "access plus 30 days"
-  ExpiresByType text/css    "access plus 7 days"
-  ExpiresByType application/javascript "access plus 7 days"
+    ExpiresActive On
+    ExpiresByType text/css                "access plus 7 days"
+    ExpiresByType application/javascript  "access plus 7 days"
+    ExpiresByType image/webp              "access plus 30 days"
+    ExpiresByType image/png               "access plus 30 days"
+    ExpiresByType image/jpeg              "access plus 30 days"
+    ExpiresByType image/x-icon            "access plus 30 days"
+    ExpiresByType image/svg+xml           "access plus 30 days"
+    ExpiresByType text/html               "access plus 1 hour"
+</IfModule>
+<IfModule mod_headers.c>
+    Header append Vary: Accept-Encoding
 </IfModule>
