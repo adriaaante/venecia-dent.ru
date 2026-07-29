@@ -26,10 +26,16 @@ WM_PATH = ROOT / "assets" / "img" / "watermark.png"
 
 # Знак Венеции — плотная плашка-логотип (в отличие от лёгкой линейной
 # графики Angel/Versal), поэтому он меньше и прозрачнее: при 32%/78%
-# перетягивал внимание с клинического фото. Ниже 20%/45% зуб перестаёт
-# читаться и знак превращается в мутный квадрат — не опускать.
-WM_WIDTH_RATIO = 0.24  # watermark width as fraction of image width
-WM_MARGIN_RATIO = 0.03
+# перетягивал внимание с клинического фото. Ниже 0.26 короткой стороны
+# зуб перестаёт читаться и знак превращается в мутный квадрат — не опускать.
+#
+# ⚠️ Размер считаем от КОРОТКОЙ стороны кадра, а не от ширины. Знак
+# квадратный, и при расчёте от ширины на широких снимках (`*-full`,
+# например 1100×504) он занимал больше половины высоты кадра и выглядел
+# огромным, хотя формально это были «те же 24%». От короткой стороны
+# знак весит одинаково на любом соотношении сторон.
+WM_SIZE_RATIO = 0.32    # сторона знака как доля от короткой стороны кадра
+WM_MARGIN_RATIO = 0.04  # отступ — тоже от короткой стороны
 WM_OPACITY = 0.62
 # Под знаком мягкий тёмный halo, чтобы он оставался читаемым
 # и на белом, и на тёмном фоне.
@@ -40,7 +46,9 @@ SHADOW_BLUR_RATIO = 0.014  # радиус блюра как доля от шир
 def watermark_image(src: Path, out: Path, wm: Image.Image) -> None:
     img = Image.open(src).convert("RGBA")
 
-    target_w = int(img.width * WM_WIDTH_RATIO)
+    short_side = min(img.width, img.height)
+
+    target_w = int(short_side * WM_SIZE_RATIO)
     scale = target_w / wm.width
     target_h = int(wm.height * scale)
     wm_scaled = wm.resize((target_w, target_h), Image.LANCZOS)
@@ -48,7 +56,7 @@ def watermark_image(src: Path, out: Path, wm: Image.Image) -> None:
     alpha = wm_scaled.split()[3].point(lambda p: int(p * WM_OPACITY))
     wm_scaled.putalpha(alpha)
 
-    margin = int(img.width * WM_MARGIN_RATIO)
+    margin = int(short_side * WM_MARGIN_RATIO)
     pos = (img.width - target_w - margin, img.height - target_h - margin)
 
     blur_radius = max(2, int(target_w * SHADOW_BLUR_RATIO))
