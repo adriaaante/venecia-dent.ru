@@ -954,7 +954,7 @@ a.doctor-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md);
 .pf-lightbox__section p { font-size: 15px; line-height: 1.6; color: var(--c-ink); }
 .pf-lightbox__gallery { margin: 2px 0 18px; }
 .pf-shots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.pf-shot { position: relative; display: block; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; border-radius: var(--radius); overflow: hidden; aspect-ratio: 4 / 3; box-shadow: var(--shadow-sm); }
+.pf-shot { position: relative; display: block; width: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; border-radius: var(--radius); overflow: hidden; aspect-ratio: 4 / 3; box-shadow: var(--shadow-sm); }
 .pf-shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .pf-shot__cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 9px 7px; font-size: 12px; line-height: 1.25; color: #fff; text-align: left; background: linear-gradient(to top, rgba(0,0,0,.62), rgba(0,0,0,0)); }
 .pf-shot--graphic img { filter: blur(16px); transform: scale(1.08); }
