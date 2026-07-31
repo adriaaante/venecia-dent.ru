@@ -114,10 +114,15 @@
   document.querySelectorAll('input[type="tel"]').forEach(maskPhone);
 
   // Отправка заявки — POST в /api/lead.php (токен бота только на сервере).
+  // Момент загрузки страницы — по нему сервер отличает живого человека от
+  // бота: заполнить имя и телефон быстрее пары секунд физически нельзя.
+  var pageOpenedAt = Date.now();
+
   function sendLead(form) {
     var fd = new FormData(form);
     fd.append('_page', location.origin + (location.pathname || '/'));
     fd.append('_referrer', document.referrer || '');
+    fd.append('_elapsed', String(Date.now() - pageOpenedAt));
     var tracking = getTrackingParams();
     Object.keys(tracking).forEach(function (key) {
       fd.append('_' + key, tracking[key]);

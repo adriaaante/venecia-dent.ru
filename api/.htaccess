@@ -1,10 +1,15 @@
-# Прячем конфиг с токеном от прямого скачивания через браузер.
+# Прячем конфиг с токеном и внутренние модули от прямого обращения.
 # PHP-файлы Apache всё равно исполняет, а не отдаёт как текст,
 # но это страховка на случай, если PHP-обработчик упадёт.
 <Files "config.php">
     Require all denied
 </Files>
 <Files "config.php.example">
+    Require all denied
+</Files>
+# store.php — общий модуль (хранилище, анти-спам), подключается из
+# lead.php и tg-webhook.php. Сам по себе вызываться не должен.
+<Files "store.php">
     Require all denied
 </Files>
 
@@ -15,6 +20,10 @@
         Deny from all
     </Files>
     <Files "config.php.example">
+        Order allow,deny
+        Deny from all
+    </Files>
+    <Files "store.php">
         Order allow,deny
         Deny from all
     </Files>
