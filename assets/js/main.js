@@ -114,15 +114,10 @@
   document.querySelectorAll('input[type="tel"]').forEach(maskPhone);
 
   // Отправка заявки — POST в /api/lead.php (токен бота только на сервере).
-  // Момент загрузки страницы — по нему сервер отличает живого человека от
-  // бота: заполнить имя и телефон быстрее пары секунд физически нельзя.
-  var pageOpenedAt = Date.now();
-
   function sendLead(form) {
     var fd = new FormData(form);
     fd.append('_page', location.origin + (location.pathname || '/'));
     fd.append('_referrer', document.referrer || '');
-    fd.append('_elapsed', String(Date.now() - pageOpenedAt));
     var tracking = getTrackingParams();
     Object.keys(tracking).forEach(function (key) {
       fd.append('_' + key, tracking[key]);
@@ -175,12 +170,6 @@
         function () { done(true, 'Спасибо! Мы перезвоним в течение 15 минут.'); },
         function (err) {
           console.warn('[lead] failed', err);
-          // Телефон не прошёл серверную проверку — человек должен понять,
-          // что дело в номере, и исправить его, а не гадать.
-          if (err && err.error === 'invalid_phone') {
-            done(false, 'Проверьте номер телефона — кажется, в нём опечатка.');
-            return;
-          }
           done(false, 'Не удалось отправить. Позвоните, пожалуйста: +7 (000) 000-00-00');
         }
       );

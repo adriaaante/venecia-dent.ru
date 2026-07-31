@@ -49,68 +49,19 @@ if (!defined('TELEGRAM_BOT_TOKEN') || !defined('TELEGRAM_CHAT_ID')
     reply(500, ['ok' => false, 'error' => 'config_incomplete']);
 }
 
-define('LEAD_APP', 1);
-require __DIR__ . '/store.php';
-
-// Тихий отказ: спамеру отвечаем «принято», чтобы он не начал подбирать
-// формулировки. Заявка при этом никуда не уходит, а попытка пишется
-// в журнал (файл spam.log в каталоге состояния).
-function drop_silently(string $why, array $ctx = []): void {
-    lead_log('spam.log', $why . ' | ' . json_encode($ctx, JSON_UNESCAPED_UNICODE));
-    reply(200, ['ok' => true]);
-}
-
 // Honeypot: поле "company" скрыто от людей, боты его обычно заполняют.
 // Если пришло непустым — молча подтверждаем и ничего не шлём.
 if (!empty($_POST['company'] ?? '')) {
-    drop_silently('honeypot');
+    reply(200, ['ok' => true]);
 }
 
 // Серверная проверка телефона — страховка на случай, если JS-валидация
-// обойдена (бот шлёт POST напрямую или скрипт не загрузился).
-// Здесь отвечаем ошибкой, а не тихо: живой человек мог опечататься,
-// и ему нужно об этом сказать.
-$phoneRaw    = (string)($_POST['phone'] ?? '');
-$phoneDigits = lead_normalize_phone($phoneRaw);
-if (!lead_phone_is_valid($phoneDigits)) {
-    lead_log('spam.log', 'bad_phone | ' . json_encode(['phone' => $phoneRaw], JSON_UNESCAPED_UNICODE));
+// обойдена (бот шлёт POST напрямую или скрипт не загрузился). Полный
+// российский номер — ровно 11 цифр (код 7/8 + 10 значащих).
+$phoneDigits = preg_replace('/\D/', '', (string)($_POST['phone'] ?? ''));
+if (strlen($phoneDigits) !== 11 || !in_array($phoneDigits[0], ['7', '8'], true)) {
     reply(400, ['ok' => false, 'error' => 'invalid_phone']);
 }
-
-// Чёрный список: номер добавляется командой /ban в Telegram-группе.
-if (lead_is_blacklisted($phoneDigits)) {
-    drop_silently('blacklist', ['phone' => $phoneDigits]);
-}
-
-// Контентные фильтры: ссылки, рекламная лексика, нечеловеческая скорость
-// заполнения. Порог 3 балла — см. lead_spam_score() в store.php.
-$elapsed = isset($_POST['_elapsed']) && ctype_digit((string)$_POST['_elapsed'])
-    ? (int)$_POST['_elapsed']
-    : -1;
-list($spamScore, $spamReasons) = lead_spam_score([
-    'name'    => (string)($_POST['name'] ?? ''),
-    'message' => (string)($_POST['message'] ?? ''),
-    'service' => (string)($_POST['service'] ?? ''),
-], $elapsed);
-if ($spamScore >= LEAD_SPAM_THRESHOLD) {
-    drop_silently('spam_content', [
-        'score'   => $spamScore,
-        'reasons' => $spamReasons,
-        'phone'   => $phoneDigits,
-        'name'    => mb_substr((string)($_POST['name'] ?? ''), 0, 80),
-    ]);
-}
-
-// Частота с одного адреса. Отбрасываем только явный поток (>40 в час);
-// «многовато» — доставляем с пометкой, чтобы не потерять живого человека
-// за общим IP мобильного оператора.
-$clientIp   = lead_client_ip();
-$rateStatus = lead_rate_status($clientIp);
-if ($rateStatus === 'drop') {
-    drop_silently('rate_flood', ['ip' => $clientIp, 'phone' => $phoneDigits]);
-}
-$rateWarning = $rateStatus === 'mark';
-
 
 $labels = [
     'name'    => 'Имя',
@@ -120,12 +71,6 @@ $labels = [
 ];
 
 $lines = ['🦷 *Заявка с сайта «Венеция»*', ''];
-if (!empty($rateWarning)) {
-    // Заявку доставляем в любом случае — пометка нужна лишь чтобы
-    // администратор знал: с этого адреса за час пришло необычно много.
-    $lines[] = '⚠️ _С этого IP за час много заявок — возможен спам, проверьте._';
-    $lines[] = '';
-}
 foreach ($_POST as $key => $value) {
     if ($key === 'company' || $key[0] === '_') continue;
     $value = trim((string)$value);
@@ -215,22 +160,9 @@ curl_close($ch);
 if ($httpCode >= 200 && $httpCode < 300 && $response !== false) {
     $decoded = json_decode($response, true);
     if (is_array($decoded) && !empty($decoded['ok'])) {
-        // Запоминаем id отправленного сообщения: по нему команда /delete
-        // в группе понимает, что именно является заявками, и может
-        // отчитаться, сколько их осталось.
-        $mid = (int)($decoded['result']['message_id'] ?? 0);
-        if ($mid > 0) {
-            $sent = lead_json_read('sent.json', []);
-            $sent[] = ['id' => $mid, 'ts' => time(), 'phone' => $phoneDigits];
-            if (count($sent) > 200) {
-                $sent = array_slice($sent, -200);
-            }
-            lead_json_write('sent.json', $sent);
-        }
         reply(200, ['ok' => true]);
     }
 }
-
 
 // Логируем в error_log, но клиенту деталей не отдаём.
 error_log('[venecia-dent lead] telegram failed: http=' . $httpCode

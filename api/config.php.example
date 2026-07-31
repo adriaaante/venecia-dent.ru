@@ -1,26 +1,8 @@
 <?php
-// Шаблон конфига для api/lead.php и api/tg-webhook.php.
-// Скопируйте в api/config.php и заполните реальные значения.
+// Шаблон конфига для api/lead.php.
+// На сервере: cp api/config.php.example api/config.php и заполнить значения.
 // api/config.php в .gitignore — в репо не коммитится.
 
-// --- Бот заявок ---
+// TODO: токен бота заявок «Венеции» (@BotFather) и chat_id группы заявок.
 define('TELEGRAM_BOT_TOKEN', 'PUT-YOUR-BOT-TOKEN-HERE');
 define('TELEGRAM_CHAT_ID',  'PUT-CHAT-ID-HERE');
-
-// --- Управление ботом из группы (команды /delete, /ban, /unban, /banlist) ---
-// Произвольная длинная строка. Её же передаём в setWebhook как secret_token:
-// Telegram будет присылать её в заголовке, а мы сверять. Без совпадения
-// запрос отбрасывается, поэтому дёрнуть webhook со стороны не выйдет.
-// Сгенерировать: openssl rand -hex 24
-define('TELEGRAM_WEBHOOK_SECRET', 'PUT-RANDOM-SECRET-HERE');
-
-// Необязательно: ограничить команды конкретными людьми (id через запятую).
-// Свой id можно узнать у бота @userinfobot. Если не задавать — команды
-// доступны всем участникам группы заявок.
-// define('TELEGRAM_ADMIN_IDS', '123456789,987654321');
-
-// Необязательно: где хранить чёрный список, счётчики лимитов и журналы.
-// По умолчанию — <домашний каталог>/.leadstate-<домен>, то есть ВНЕ
-// публичной папки: состояние недоступно по HTTP и переживает выкатку
-// (rsync --delete чистит только docroot).
-// define('LEAD_STATE_DIR', '/var/www/u3501870/data/.leadstate-venecia-dent.ru');
