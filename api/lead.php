@@ -92,7 +92,7 @@ list($spamScore, $spamReasons) = lead_spam_score([
     'message' => (string)($_POST['message'] ?? ''),
     'service' => (string)($_POST['service'] ?? ''),
 ], $elapsed);
-if ($spamScore >= 3) {
+if ($spamScore >= LEAD_SPAM_THRESHOLD) {
     drop_silently('spam_content', [
         'score'   => $spamScore,
         'reasons' => $spamReasons,
@@ -101,11 +101,15 @@ if ($spamScore >= 3) {
     ]);
 }
 
-// Частота с одного адреса: 3 заявки в час, 8 в сутки.
-$clientIp = lead_client_ip();
-if (!lead_rate_ok($clientIp)) {
-    drop_silently('rate_limit', ['ip' => $clientIp, 'phone' => $phoneDigits]);
+// Частота с одного адреса. Отбрасываем только явный поток (>40 в час);
+// «многовато» — доставляем с пометкой, чтобы не потерять живого человека
+// за общим IP мобильного оператора.
+$clientIp   = lead_client_ip();
+$rateStatus = lead_rate_status($clientIp);
+if ($rateStatus === 'drop') {
+    drop_silently('rate_flood', ['ip' => $clientIp, 'phone' => $phoneDigits]);
 }
+$rateWarning = $rateStatus === 'mark';
 
 
 $labels = [
@@ -116,6 +120,12 @@ $labels = [
 ];
 
 $lines = ['🦷 *Заявка с сайта «Венеция»*', ''];
+if (!empty($rateWarning)) {
+    // Заявку доставляем в любом случае — пометка нужна лишь чтобы
+    // администратор знал: с этого адреса за час пришло необычно много.
+    $lines[] = '⚠️ _С этого IP за час много заявок — возможен спам, проверьте._';
+    $lines[] = '';
+}
 foreach ($_POST as $key => $value) {
     if ($key === 'company' || $key[0] === '_') continue;
     $value = trim((string)$value);
