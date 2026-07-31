@@ -22,9 +22,9 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # Текущие значения в файлах сайта. После успешного прогона скрипт
 # сам переписывает этот блок на новые значения.
 CURRENT = {
-    'phone_display': '+7 (000) 000-00-00',
-    'phone_digits': '70000000000',
-    'email': 'venecia.dent@mail.ru',
+    'phone_display': '+7 (916) 838-08-88',
+    'phone_digits': '79168380888',
+    'email': 'venecia.1@mail.ru',
     'metrika': '00000000',
 }
 
@@ -67,7 +67,12 @@ def main():
             ('YM_COUNTER_ID = 0;', f'YM_COUNTER_ID = {args.metrika};'),
         ]
 
-    files = list(ROOT.glob('*.html')) + list(ROOT.glob('services/*.html'))
+    # Берём ВСЕ html рекурсивно, а не перечисленные папки: раздел doctors/
+    # появился позже скрипта, и при жёстком списке ('*.html' + 'services/*')
+    # страницы врачей молча остались с телефоном-заглушкой. Рекурсивный обход
+    # переживёт появление любых новых разделов.
+    files = sorted(ROOT.glob('**/*.html'))
+    files = [f for f in files if '_materials' not in f.parts and '.git' not in f.parts]
     files += [ROOT / 'assets/js/main.js', ROOT / 'CLAUDE.md']
     changed = 0
     for f in files:
