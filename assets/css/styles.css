@@ -31,6 +31,11 @@
   --shadow-lg: 0 24px 60px rgba(10, 74, 70, .16);
 
   --container: 1180px;
+
+  /* Высота липкой панели «Позвонить/Записаться» без учёта safe-area.
+     От неё считаются нижний отступ футера и позиция FAB — держать
+     в синхроне с паддингами .sticky-cta. */
+  --sticky-cta-h: 66px;
 }
 
 /* ---------- Reset / base ---------- */
@@ -164,6 +169,9 @@ ul, ol { margin: 0 0 1em; padding-left: 22px; }
 .topbar__inner {
   display: flex; justify-content: space-between; align-items: center;
   gap: 18px; padding-top: 7px; padding-bottom: 7px;
+  /* Держим одну ширину с .header__inner, иначе на широких экранах
+     верхняя полоса и шапка расходятся по левому и правому краю. */
+  max-width: 1400px;
 }
 .topbar__items { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
 .topbar__item { display: inline-flex; align-items: center; gap: 7px; }
@@ -178,31 +186,37 @@ ul, ol { margin: 0 0 1em; padding-left: 22px; }
   border-bottom: 1px solid var(--c-tint);
 }
 .header__inner {
-  display: flex; align-items: center; gap: 20px;
+  display: flex; align-items: center; gap: 16px;
   padding-top: 12px; padding-bottom: 12px;
+  /* Шапке нужно больше ширины, чем контентному контейнеру (1180):
+     лого + 8 пунктов меню + телефон с кнопкой в 1180 не помещаются,
+     и кнопка «Записаться» уезжала за правый край экрана. */
+  max-width: 1400px;
 }
 .logo { display: inline-flex; align-items: center; gap: 12px; flex: none; }
 .logo__mark img { width: 46px; height: 46px; border-radius: 12px; }
 .logo__name {
   font-family: var(--font-head);
-  font-size: 24px; line-height: 1.05; color: var(--c-ink);
+  font-size: 23px; line-height: 1.05; color: var(--c-ink);
   display: flex; flex-direction: column;
 }
 .logo__name small {
   font-family: var(--font-body);
   font-size: 9.5px; font-weight: 600;
-  letter-spacing: .21em; color: var(--c-lagoon);
+  /* Трекинг подписи — главный источник ширины логотипа; на .21em блок
+     разрастался и вместе с меню выдавливал кнопку «Записаться» за экран. */
+  letter-spacing: .16em; color: var(--c-lagoon);
   margin-top: 4px;
 }
-.nav { display: flex; gap: 4px; margin-left: auto; }
+.nav { display: flex; gap: 2px; margin-left: auto; }
 .nav a {
-  padding: 9px 11px; border-radius: 999px; white-space: nowrap;
-  color: var(--c-ink); font-weight: 500; font-size: 14.5px;
+  padding: 9px 9px; border-radius: 999px; white-space: nowrap;
+  color: var(--c-ink); font-weight: 500; font-size: 14px;
   transition: background .18s, color .18s;
 }
 .nav a:hover { background: rgba(15, 110, 102, .08); color: var(--c-lagoon-deep); }
 .nav a.is-active { background: rgba(15, 110, 102, .1); color: var(--c-lagoon); font-weight: 600; }
-.header__cta { display: flex; align-items: center; gap: 16px; margin-left: auto; }
+.header__cta { display: flex; align-items: center; gap: 12px; margin-left: auto; }
 .nav + .header__cta { margin-left: 0; }
 .header__phone {
   display: flex; flex-direction: column; align-items: flex-end; white-space: nowrap;
@@ -769,7 +783,20 @@ a.service-card:hover .service-card__link { color: var(--c-terra-deep); gap: 9px;
 .js-reveal.is-visible { opacity: 1; transform: none; }
 
 /* ---------- Адаптив ---------- */
-@media (max-width: 1080px) {
+/* Меню Венеции длиннее, чем у соседних клиник: 8 пунктов, среди них
+   «Первый визит» и «О клинике», да ещё пилюли с внутренними отступами.
+   На ноутбучных ширинах оно помещается рядом с телефоном и кнопкой
+   только уплотнённым — иначе «Записаться» уезжает за правый край.
+   На широких мониторах остаётся просторный вид. */
+@media (min-width: 1280px) and (max-width: 1420px) {
+  .nav a { padding: 9px 7px; font-size: 13.6px; }
+  .header__phone { font-size: 15.5px; }
+}
+
+/* Ниже 1280 полное меню не помещается даже уплотнённым — бургер.
+   Раньше порог был 1080px, и в диапазоне 1081–1279 кнопка «Записаться»
+   уходила за пределы экрана. */
+@media (max-width: 1279px) {
   .nav { display: none; }
   .header .nav {
     display: none;
@@ -783,6 +810,13 @@ a.service-card:hover .service-card__link { color: var(--c-terra-deep); gap: 9px;
   .header .nav.is-open { display: flex; }
   .burger { display: grid; place-items: center; }
   .header__phone { display: none; }
+  /* Вправо блок толкало меню (у него margin-left:auto). Меню спрятано —
+     толкать нечем, и кнопка с бургером прилипали к логотипу, оставляя
+     полэкрана пустоты справа. Возвращаем прижатие явно. */
+  .nav + .header__cta { margin-left: auto; }
+}
+
+@media (max-width: 1080px) {
   .services-grid { grid-template-columns: repeat(2, 1fr); }
   .steps, .steps--4 { grid-template-columns: repeat(3, 1fr); }
   .usps__grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
@@ -809,7 +843,12 @@ a.service-card:hover .service-card__link { color: var(--c-terra-deep); gap: 9px;
   .related__grid, .related__grid--4 { grid-template-columns: 1fr; }
   .footer__grid { grid-template-columns: 1fr; gap: 28px; }
   .sticky-cta { display: flex; }
-  .fab { bottom: 74px; }
+  /* Панель fixed — сама по себе места в потоке не занимает, поэтому
+     низ документа (копирайт и бейдж студии) уезжает под неё. Добираем
+     футеру отступ; именно футеру, а не body, — тогда под полупрозрачной
+     панелью продолжается тёмный фон, а не светлая полоса. */
+  .footer { padding-bottom: calc(30px + var(--sticky-cta-h) + env(safe-area-inset-bottom)); }
+  .fab { bottom: calc(var(--sticky-cta-h) + 8px + env(safe-area-inset-bottom)); }
   .clinic-gallery { grid-template-columns: 1fr; }
   .header__cta .btn { display: none; }
   .hero__cta .btn { flex: 1 1 auto; }
