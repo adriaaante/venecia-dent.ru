@@ -55,10 +55,15 @@ FADED = '#9DC4BC'         # мелкий шрифт на тёмном
 T = {
     'brand': 'Венеция',
     'brand_sub': 'СЕМЕЙНАЯ СТОМАТОЛОГИЯ · МЫТИЩИ',
-    'badge_front': 'АКЦИЯ ПО ЭТОМУ БУКЛЕТУ',
-    'headline1': 'Каждый третий имплант',
-    'headline2': '— в подарок',
-    'front_sub': 'И ещё четыре предложения — на обороте',
+    'badge_front': 'АКЦИИ ПО ЭТОМУ БУКЛЕТУ',
+    'headline1': 'Пять поводов улыбнуться',
+    'headline2': '— для всей семьи',
+    'front_chips': [
+        ('Гигиена', '5 000 ₽'),
+        ('Брекеты', '50 000 ₽'),
+        ('Имплант + коронка', '42 000 ₽'),
+    ],
+    'front_sub': 'И ещё два предложения — на обороте',
     'phone': '+7 (916) 838-08-88',
     'contacts_line': 'Мытищи, ул. Мира, 37  ·  ежедневно 10:00–20:00  ·  venecia-dent.ru',
     'front_small': 'Акции действуют при предъявлении буклета. Имеются противопоказания,',
@@ -217,10 +222,10 @@ def build_front():
     text_tracked(d, (0, y), T['brand_sub'], f_sub, MIST, tracking=9, anchor_center_x=cx)
 
     # --- арка с фото героини
-    aw, ah = 1080, 1010
-    ax, ay = cx - aw // 2, y + 80
+    aw, ah = 1020, 880
+    ax, ay = cx - aw // 2, y + 72
     photo = cover_crop(Image.open(IMG / 'hero-woman.png').convert('RGB'), aw, ah,
-                       cx=0.42, cy=0.26)
+                       cx=0.42, cy=0.22)
     mask = arch_mask(aw, ah)
     # рамка-обводка: чуть большая арка тонкой линией
     ow, oh, off = aw + 44, ah + 44, 22
@@ -244,18 +249,44 @@ def build_front():
                  tracking=4, anchor_center_x=cx)
 
     # --- заголовок
-    y = by + bh + 64
+    y = by + bh + 56
     max_w = W - 2 * SAFE - 40
-    f_h1, _ = fit_font(d, T['headline1'], prata, 108, max_w)
+    f_h1, _ = fit_font(d, T['headline1'], prata, 100, max_w)
     text_tracked(d, (0, y), T['headline1'], f_h1, ALABASTER, anchor_center_x=cx)
     y += round(f_h1.size * 1.26)
-    f_h2, _ = fit_font(d, T['headline2'], prata, 122, max_w)
+    f_h2, _ = fit_font(d, T['headline2'], prata, 108, max_w)
     text_tracked(d, (0, y), T['headline2'], f_h2, TERRA_SOFT, anchor_center_x=cx)
-    y += round(f_h2.size * 1.40)
+    y += round(f_h2.size * 1.38)
 
-    f_fs = onest(42, 500)
+    # --- тизеры трёх направлений с ценами: буклет не выбросят, даже если
+    # главный оффер не про тебя — каждый видит своё
+    chips = T['front_chips']
+    gap = 22
+    chip_x0 = SAFE + 26
+    chip_w = (W - 2 * (SAFE + 26) - gap * (len(chips) - 1)) // len(chips)
+    chip_h = 158
+    layer = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+    ld = ImageDraw.Draw(layer)
+    f_cl = onest(34, 500)
+    f_cpr = onest(50, 800)
+    for i, (label, price) in enumerate(chips):
+        x0 = chip_x0 + i * (chip_w + gap)
+        ld.rounded_rectangle((x0, y, x0 + chip_w, y + chip_h), radius=26,
+                             fill=(247, 250, 248, 26), outline=(247, 250, 248, 70),
+                             width=2)
+        ccx = x0 + chip_w / 2
+        f_l, _ = fit_font(ld, label, lambda s: onest(s, 500), 34, chip_w - 44)
+        lw = ld.textlength(label, font=f_l)
+        ld.text((ccx - lw / 2, y + 26), label, font=f_l, fill=MIST)
+        pw = ld.textlength(price, font=f_cpr)
+        ld.text((ccx - pw / 2, y + 76), price, font=f_cpr, fill='#FFFFFF')
+    cv.alpha_composite(layer)
+    d = ImageDraw.Draw(cv)
+    y += chip_h + 40
+
+    f_fs = onest(40, 500)
     text_tracked(d, (0, y), T['front_sub'], f_fs, MIST, anchor_center_x=cx)
-    sub_bottom = y + 58
+    sub_bottom = y + 56
 
     # --- контактная плашка
     ph_h = 244
