@@ -5,8 +5,8 @@
 Формат повторяет паспорт Angel-Dent (`~/Angel-Dent-site/_materials/
 implant-passport/DESIGN.md`), стиль — фирменный Венеции:
   - A4 книжная + 2 мм вылетов = 214×301 мм, 300 dpi, 2 страницы;
-  - тройной фальц: лист делится на 3 равные панели по высоте, линии
-    сгиба на ⅓ и ⅔; на странице 1 (внешней) верхняя и нижняя панели
+  - тройной фальц по схеме типографии: панели 99,5 / 99,5 / 98 мм
+    (нижний клапан короче), сгибы на 99,5 и 199,0 мм от верхнего реза; на странице 1 (внешней) верхняя и нижняя панели
     свёрстаны «вверх ногами» — после фальцовки встают правильно;
   - метки сгиба — пунктирные чёрточки у краёв (на лагуне белые,
     на белом серые); меток реза нет.
@@ -39,10 +39,13 @@ LOGO = BASE.parent / 'buklet' / 'img' / 'logo-600.png'
 DPI = 300
 MM = DPI / 25.4
 BLEED = round(2 * MM)                      # 24 px
-TRIM_W, TRIM_H = round(210 * MM), 3507     # 2480 × 3507 (кратно 3 панелям)
+TRIM_W, TRIM_H = round(210 * MM), round(297 * MM)   # 2480 × 3508
 W, H = TRIM_W + 2 * BLEED, TRIM_H + 2 * BLEED
-PANEL = TRIM_H // 3                        # 1169
-FOLD1, FOLD2 = BLEED + PANEL, BLEED + 2 * PANEL
+# Панели НЕ равные (схема типографии): 99,5 + 99,5 + 98 мм.
+# Нижний клапан на 1,5 мм короче — он складывается внутрь первым и не
+# должен упираться в сгиб. Линии сгиба: 99,5 и 199,0 мм от верхнего реза.
+FOLD1 = BLEED + round(99.5 * MM)           # 1199
+FOLD2 = BLEED + round(199.0 * MM)          # 2374
 SAFE = BLEED + round(4 * MM)               # контент не ближе 4 мм к резу
 
 LAGOON = '#0F6E66'
@@ -381,9 +384,14 @@ def fold_marks(d, on_dark_rows):
 
 def build_page1():
     page = Image.new('RGB', (W, H), '#FFFFFF')
-    top = panel_cover(W, BLEED + PANEL).rotate(180)
-    mid = panel_middle(W, PANEL)
-    bot = panel_patient(W, BLEED + PANEL).rotate(180)
+    # Роли панелей по схеме типографии (наружная сторона):
+    #   верх 99,5 мм — ЛИЦО/обложка, печатается ВВЕРХ НОГАМИ;
+    #   середина 99,5 мм — ОБОРОТ (тыльная сторона), прямо;
+    #   низ 98 мм — внутренний клапан, тоже ВВЕРХ НОГАМИ (после
+    #   фальцовки его видит открывший обложку).
+    top = panel_cover(W, FOLD1).rotate(180)
+    mid = panel_middle(W, FOLD2 - FOLD1)
+    bot = panel_patient(W, H - FOLD2).rotate(180)
     page.paste(top, (0, 0))
     page.paste(mid, (0, FOLD1))
     page.paste(bot, (0, FOLD2))
@@ -396,54 +404,51 @@ def build_page1():
 
 # ============================================================ страница 2
 def sec_header(d, page, y, title, sub=None):
-    d.text((SAFE, y), title, font=prata(64), fill=INK)
-    d.line((SAFE, y + 90, SAFE + 460, y + 90), fill=LAGOON, width=5)
-    lg = logo_img(56)
-    bw = d.textlength(T['brand'], font=prata(44))
-    page.paste(lg, (int(W - SAFE - bw - 74), y + 8), lg)
-    d.text((W - SAFE - bw, y + 14), T['brand'], font=prata(44), fill=LAGOON)
-    y += 102
+    d.text((SAFE, y), title, font=prata(54), fill=INK)
+    d.line((SAFE, y + 78, SAFE + 430, y + 78), fill=LAGOON, width=4)
+    lg = logo_img(50)
+    bw = d.textlength(T['brand'], font=prata(40))
+    page.paste(lg, (int(W - SAFE - bw - 66), y + 6), lg)
+    d.text((W - SAFE - bw, y + 12), T['brand'], font=prata(40), fill=LAGOON)
+    y += 88
     if sub:
-        d.text((SAFE, y), sub, font=onest(30, 400), fill=MUTED)
-        y += 52
+        d.text((SAFE, y), sub, font=onest(27, 400), fill=MUTED)
+        y += 46
     return y
 
 
 def implant_card(d, x, y, w, h, n):
-    d.rounded_rectangle((x, y, x + w, y + h), radius=18, outline=TINT, width=3)
-    hh = 72
-    d.rounded_rectangle((x, y, x + w, y + hh + 18), radius=18, fill=LAGOON)
-    d.rectangle((x, y + hh - 18, x + w, y + hh), fill=LAGOON)
-    d.text((x + 30, y + 16), T['implant_card'].format(n), font=onest(34, 800), fill='#FFFFFF')
-    fw = d.textlength(T['fills_clinic'], font=onest(24, 400))
-    d.text((x + w - 30 - fw, y + 24), T['fills_clinic'], font=onest(24, 400), fill=MIST)
+    d.rounded_rectangle((x, y, x + w, y + h), radius=16, outline=TINT, width=3)
+    hh = 64
+    d.rounded_rectangle((x, y, x + w, y + hh + 16), radius=16, fill=LAGOON)
+    d.rectangle((x, y + hh - 16, x + w, y + hh), fill=LAGOON)
+    d.text((x + 28, y + 13), T['implant_card'].format(n), font=onest(31, 800), fill='#FFFFFF')
+    fw = d.textlength(T['fills_clinic'], font=onest(23, 400))
+    d.text((x + w - 28 - fw, y + 20), T['fills_clinic'], font=onest(23, 400), fill=MIST)
 
-    pad = 30
-    fy = y + hh + 22
-    f_lab = onest(25, 500)
-    cw = (w - 2 * pad - 2 * 36) // 3
+    pad = 28
+    fy = y + hh + 14
+    f_lab = onest(24, 500)
+    cw = (w - 2 * pad - 2 * 32) // 3
     for i, lab in enumerate(T['card_fields']):
-        d.text((x + pad + i * (cw + 36), fy), lab, font=f_lab, fill=MUTED)
-        dotted(d, x + pad + i * (cw + 36), fy + 44, x + pad + i * (cw + 36) + cw)
-    fy += 74
+        d.text((x + pad + i * (cw + 32), fy), lab, font=f_lab, fill=MUTED)
+        dotted(d, x + pad + i * (cw + 32), fy + 38, x + pad + i * (cw + 32) + cw)
+    fy += 60
 
-    # наклейки
-    scw = (w - 2 * pad - 36) // 2
-    sch = 138
-    f_st = onest(25, 700)
+    scw = (w - 2 * pad - 32) // 2
+    sch = 120
     for i, lab in enumerate((T['sticker1'], T['sticker2'])):
-        sxx = x + pad + i * (scw + 36)
-        d.text((sxx, fy), lab, font=f_st, fill=LAGOON)
-        box = (sxx, fy + 42, sxx + scw, fy + 42 + sch)
-        dashed_rect(d, box, '#9DB8B3')
-        ph_w = d.textlength(T['sticker_ph'], font=onest(24, 400))
-        d.text((sxx + (scw - ph_w) / 2, fy + 42 + sch / 2 - 14), T['sticker_ph'],
-               font=onest(24, 400), fill='#9DB8B3')
-    fy += 42 + sch + 22
+        sxx = x + pad + i * (scw + 32)
+        d.text((sxx, fy), lab, font=onest(24, 700), fill=LAGOON)
+        dashed_rect(d, (sxx, fy + 34, sxx + scw, fy + 34 + sch), '#9DB8B3')
+        ph_w = d.textlength(T['sticker_ph'], font=onest(23, 400))
+        d.text((sxx + (scw - ph_w) / 2, fy + 34 + sch / 2 - 13), T['sticker_ph'],
+               font=onest(23, 400), fill='#9DB8B3')
+    fy += 34 + sch + 14
 
     for i, lab in enumerate(T['card_fields2']):
-        d.text((x + pad + i * (cw + 36), fy), lab, font=f_lab, fill=MUTED)
-        dotted(d, x + pad + i * (cw + 36), fy + 44, x + pad + i * (cw + 36) + cw)
+        d.text((x + pad + i * (cw + 32), fy), lab, font=f_lab, fill=MUTED)
+        dotted(d, x + pad + i * (cw + 32), fy + 38, x + pad + i * (cw + 32) + cw)
     return y + h
 
 
@@ -469,130 +474,135 @@ def build_page2():
     page = Image.new('RGB', (W, H), '#FFFFFF')
     d = ImageDraw.Draw(page)
     cw_full = W - 2 * SAFE
+    mgap = 30
 
-    # --- секция 1: информация об имплантации
-    y = sec_header(d, page, SAFE + 10, T['p2s1_title'], T['p2s1_sub'])
-    y += 8
-    half = (cw_full - 48) // 2
-    f_lab = onest(27, 500)
-    d.rectangle((SAFE, y, SAFE + half, y + 74), fill=FILL)
-    d.text((SAFE + 22, y + 12), T['clinic_field'], font=f_lab, fill=MUTED)
-    dotted(d, SAFE + 220, y + 52, SAFE + half - 22)
-    d.rectangle((SAFE + half + 48, y, W - SAFE, y + 74), fill=FILL)
-    d.text((SAFE + half + 70, y + 12), T['system_field'], font=f_lab, fill=MUTED)
-    dotted(d, SAFE + half + 70 + 560, y + 52, W - SAFE - 22)
-    y += 108
+    # ================= ПАНЕЛЬ А (верхняя, до сгиба на 99,5 мм) =========
+    # секция «Информация об имплантации» должна ЦЕЛИКОМ лежать выше
+    # FOLD1 — иначе сгиб пройдёт по карточкам имплантатов
+    y = sec_header(d, page, SAFE + 8, T['p2s1_title'], T['p2s1_sub'])
+    y += 4
+    half = (cw_full - 44) // 2
+    f_lab = onest(26, 500)
+    d.rectangle((SAFE, y, SAFE + half, y + 64), fill=FILL)
+    d.text((SAFE + 22, y + 10), T['clinic_field'], font=f_lab, fill=MUTED)
+    dotted(d, SAFE + 210, y + 46, SAFE + half - 22)
+    d.rectangle((SAFE + half + 44, y, W - SAFE, y + 64), fill=FILL)
+    d.text((SAFE + half + 66, y + 10), T['system_field'], font=f_lab, fill=MUTED)
+    dotted(d, SAFE + half + 66 + 540, y + 46, W - SAFE - 22)
+    y += 82
 
-    card_h = 430
+    card_h = 380
     for r in range(2):
         for c in range(2):
-            implant_card(d, SAFE + c * (half + 48), y + r * (card_h + 30), half, card_h, r * 2 + c + 1)
-    y += 2 * card_h + 30 + 20
-    d.text((SAFE, y), T['lab_line'], font=onest(28, 700), fill=LAGOON)
-    lab_w = d.textlength(T['lab_line'], font=onest(28, 700))
-    dotted(d, SAFE + lab_w + 30, y + 26, W - SAFE)
-    y += 56
+            implant_card(d, SAFE + c * (half + 44), y + r * (card_h + 24),
+                         half, card_h, r * 2 + c + 1)
+    y += 2 * card_h + 24 + 14
+    d.text((SAFE, y), T['lab_line'], font=onest(27, 700), fill=LAGOON)
+    lab_w = d.textlength(T['lab_line'], font=onest(27, 700))
+    dotted(d, SAFE + lab_w + 28, y + 24, W - SAFE)
+    y += 40
+    assert y <= FOLD1 - 26, f'секция 1 наезжает на сгиб: {y} > {FOLD1 - 26}'
 
-    # --- секция 2: после операции
+    # ================= ПАНЕЛЬ Б (средняя, между сгибами) ===============
+    y = FOLD1 + 32
     y = sec_header(d, page, y, T['p2s2_title'], T['p2s2_sub'])
-    y += 4
-    mgap = 30
+    y += 2
     mw = (cw_full - 3 * mgap) // 4
-    mh = 204
+    mh = 192
     for i, (num, title, lines) in enumerate(T['memos']):
         x0 = SAFE + i * (mw + mgap)
         d.rounded_rectangle((x0, y, x0 + mw, y + mh), radius=14, fill=WARM)
         d.rectangle((x0, y + 12, x0 + 7, y + mh - 12), fill=TERRA)
-        d.text((x0 + 30, y + 22), num, font=prata(44), fill=TERRA)
-        d.text((x0 + 110, y + 32), title, font=onest(31, 700), fill=INK)
-        ly = y + 96
+        d.text((x0 + 28, y + 20), num, font=prata(40), fill=TERRA)
+        d.text((x0 + 102, y + 28), title, font=onest(29, 700), fill=INK)
+        ly = y + 88
         for line in lines:
-            d.text((x0 + 30, ly), line, font=onest(25, 400), fill=INK)
-            ly += 38
-    y += mh + 38
+            d.text((x0 + 28, ly), line, font=onest(24, 400), fill=INK)
+            ly += 36
+    y += mh + 30
 
-    # --- нумерация зубов
-    d.text((SAFE, y), T['numbering_title'], font=prata(52), fill=INK)
-    tw_ = d.textlength(T['numbering_title'], font=prata(52))
-    d.text((SAFE + tw_ + 26, y + 20), T['numbering_note'], font=onest(27, 400), fill=MUTED)
-    d.line((SAFE, y + 74, SAFE + 420, y + 74), fill=LAGOON, width=4)
-    y += 98
+    # нумерация зубов
+    d.text((SAFE, y), T['numbering_title'], font=prata(46), fill=INK)
+    tw_ = d.textlength(T['numbering_title'], font=prata(46))
+    d.text((SAFE + tw_ + 24, y + 16), T['numbering_note'], font=onest(25, 400), fill=MUTED)
+    d.line((SAFE, y + 66, SAFE + 400, y + 66), fill=LAGOON, width=4)
+    y += 84
     for lab, note, top, bottom in (
             (T['fdi_label'], T['fdi_note'],
              [18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28],
              [48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38]),
             (T['ada_label'], T['ada_note'],
              list(range(1, 17)), list(range(32, 16, -1)))):
-        d.text((SAFE, y), lab, font=onest(30, 800), fill=LAGOON)
-        lw_ = d.textlength(lab, font=onest(30, 800))
-        d.text((SAFE + lw_ + 20, y + 3), note, font=onest(25, 400), fill=MUTED)
-        y += 46
-        y = num_table(d, y, top, bottom) + 22
-    y += 8
+        d.text((SAFE, y), lab, font=onest(28, 800), fill=LAGOON)
+        lw_ = d.textlength(lab, font=onest(28, 800))
+        d.text((SAFE + lw_ + 18, y + 3), note, font=onest(24, 400), fill=MUTED)
+        y += 40
+        y = num_table(d, y, top, bottom) + 14
 
-    # --- тревожная строка
-    d.rounded_rectangle((SAFE, y, W - SAFE, y + 80), radius=14, fill=WARM)
-    d.text((SAFE + 28, y + 20), T['alert'], font=onest(31, 800), fill=TERRA)
-    aw = d.textlength(T['alert'], font=onest(31, 800))
-    d.text((SAFE + 28 + aw + 18, y + 22), T['alert_text'], font=onest(29, 400), fill=INK)
-    y += 108
+    # тревожная строка
+    y += 6
+    d.rounded_rectangle((SAFE, y, W - SAFE, y + 72), radius=12, fill=WARM)
+    d.text((SAFE + 26, y + 17), T['alert'], font=onest(29, 800), fill=TERRA)
+    aw = d.textlength(T['alert'], font=onest(29, 800))
+    d.text((SAFE + 26 + aw + 16, y + 19), T['alert_text'], font=onest(27, 400), fill=INK)
+    y += 96
 
-    # --- привычки
-    d.text((SAFE, y), T['habits_title'], font=prata(52), fill=INK)
-    d.line((SAFE, y + 74, SAFE + 420, y + 74), fill=LAGOON, width=4)
-    y += 100
+    # привычки
+    d.text((SAFE, y), T['habits_title'], font=prata(46), fill=INK)
+    d.line((SAFE, y + 66, SAFE + 400, y + 66), fill=LAGOON, width=4)
+    y += 84
     hw = (cw_full - 3 * mgap) // 4
-    hh2 = 154
+    hh2 = 146
     for i, (num, title, sub) in enumerate(T['habits']):
         x0 = SAFE + i * (hw + mgap)
         d.rounded_rectangle((x0, y, x0 + hw, y + hh2), radius=14,
                             outline=TINT, width=3)
-        d.text((x0 + 28, y + 18), num, font=onest(28, 800), fill=TERRA)
-        d.text((x0 + 28, y + 60), title, font=onest(28, 700), fill=INK)
-        d.text((x0 + 28, y + 108), sub, font=onest(24, 400), fill=MUTED)
-    y += hh2 + 38
+        d.text((x0 + 26, y + 16), num, font=onest(27, 800), fill=TERRA)
+        d.text((x0 + 26, y + 56), title, font=onest(27, 700), fill=INK)
+        d.text((x0 + 26, y + 102), sub, font=onest(23, 400), fill=MUTED)
+    y += hh2
+    assert y <= FOLD2 - 26, f'панель Б наезжает на сгиб: {y} > {FOLD2 - 26}'
 
-    # --- график осмотров
+    # ================= ПАНЕЛЬ В (нижняя, клапан 98 мм) =================
+    y = FOLD2 + 36
     y = sec_header(d, page, y, T['schedule_title'], T['schedule_sub'])
-    y += 4
+    y += 2
     cols = [0.20, 0.37, 0.215, 0.215]
     xs = [SAFE]
     for c in cols:
         xs.append(xs[-1] + cw_full * c)
-    th = 66
+    th = 64
     d.rounded_rectangle((SAFE, y, W - SAFE, y + th), radius=12, fill=LAGOON)
-    f_th = onest(28, 700)
     for i, htxt in enumerate(T['schedule_head']):
-        d.text((xs[i] + 28, y + 16), htxt, font=f_th, fill='#FFFFFF')
+        d.text((xs[i] + 28, y + 15), htxt, font=onest(28, 700), fill='#FFFFFF')
     y += th
     rh = 66
     for i, (term, goal) in enumerate(T['schedule']):
         if i % 2 == 0:
             d.rectangle((SAFE, y, W - SAFE, y + rh), fill=FILL)
-        d.text((xs[0] + 28, y + 20), term, font=onest(30, 700), fill=INK)
-        d.text((xs[1] + 28, y + 20), goal, font=onest(30, 400), fill=INK)
-        dotted(d, xs[2] + 28, y + rh - 24, xs[3] - 40)
-        dotted(d, xs[3] + 28, y + rh - 24, W - SAFE - 40)
+        d.text((xs[0] + 28, y + 18), term, font=onest(29, 700), fill=INK)
+        d.text((xs[1] + 28, y + 18), goal, font=onest(29, 400), fill=INK)
+        dotted(d, xs[2] + 28, y + rh - 22, xs[3] - 40)
+        dotted(d, xs[3] + 28, y + rh - 22, W - SAFE - 40)
         y += rh
-    y += 40
+    y += 42
 
-    # --- спасибо
-    d.text((SAFE, y), T['thanks_title'], font=prata(64), fill=LAGOON)
-    y += 88
+    # спасибо
+    d.text((SAFE, y), T['thanks_title'], font=prata(58), fill=LAGOON)
+    y += 84
     for line in T['thanks_text']:
-        d.text((SAFE, y), line, font=onest(31, 400), fill=INK)
+        d.text((SAFE, y), line, font=onest(30, 400), fill=INK)
         y += 42
-    y += 10
-    d.text((SAFE, y), T['thanks_sign'], font=onest(31, 600), fill=TERRA)
-    y += 60
+    y += 8
+    d.text((SAFE, y), T['thanks_sign'], font=onest(30, 600), fill=TERRA)
+    y += 56
+    assert y <= H - SAFE + 6, f'панель В переполнена: {y} > {H - SAFE}'
 
-    assert y <= H - SAFE + 10, f'страница 2 переполнена: контент до {y}, лимит {H - SAFE}'
-
-    # водяной знак-зуб в правом нижнем углу (как у Angel — призрачный логотип)
-    lg = logo_img(300)
+    # призрачный логотип в правом нижнем углу
+    lg = logo_img(280)
     ghost = lg.copy()
     ghost.putalpha(ghost.getchannel('A').point(lambda a: a * 8 // 100))
-    page.paste(ghost, (W - SAFE - 300, H - SAFE - 300), ghost)
+    page.paste(ghost, (W - SAFE - 280, H - SAFE - 280), ghost)
 
     fold_marks(d, on_dark_rows=set())
     return page
