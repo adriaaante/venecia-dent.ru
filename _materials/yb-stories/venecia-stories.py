@@ -19,7 +19,7 @@
 Prata + Onest (шрифты в ../buklet/fonts/), ромб-буллеты, лого logo-600.png.
 
 Запуск из _materials/yb-stories/:  python3 venecia-stories.py
-Выход: out/s<история>-<слайд>.jpg (12 слайдов, 4 истории по 3).
+Выход: out/s<история>-<слайд>.jpg (6 историй по 3 слайда).
 """
 import pathlib
 
@@ -63,8 +63,8 @@ SLIDES = [
     dict(bg='price-plan.png', out='s2-2.jpg', kind='points',
          title='План — на бумаге',
          points=['Цены и сроки фиксируем\nдо начала лечения',
-                 'Консультация с планом —\n1 000 ₽',
-                 'Комплексная гигиена —\n5 000 ₽'],
+                 'Смета на все услуги — от\nгигиены до имплантации',
+                 'Консультация с планом —\n1 000 ₽'],
          disclaimer=True),
     dict(bg='price-cta.png', out='s2-3.jpg', kind='cta',
          title='Без сюрпризов\nв конце',
@@ -94,6 +94,34 @@ SLIDES = [
     dict(bg='ortho-smile.png', out='s4-3.jpg', kind='cta',
          title='Узнайте\nсвой вариант',
          sub='Запись за пару минут',
+         disclaimer=True),
+
+    # История 5 — «Брекеты взрослым» (миф про возраст)
+    dict(bg='braces-cover.png', out='s5-1.jpg', kind='cover', scrim=True,
+         q='Брекеты после 30 —\nне поздно?', sub='Самый частый вопрос ортодонту'),
+    dict(bg='braces-macro.png', out='s5-2.jpg', kind='points',
+         title='Поздно не бывает',
+         points=['Зубы двигаются\nв любом возрасте',
+                 'Брекет-система под ключ —\nот 35 000 ₽',
+                 'Элайнеры — почти невидимы,\nот 120 000 ₽'],
+         disclaimer=True),
+    dict(bg='braces-cta.png', out='s5-3.jpg', kind='cta',
+         title='Ровные зубы\nидут всем',
+         sub='Консультация ортодонта — бесплатно',
+         disclaimer=True),
+
+    # История 6 — «Имплантация»
+    dict(bg='implant-cover.png', out='s6-1.jpg', kind='cover',
+         q='Потеряли зуб —\nчто дальше?', sub='Соседние зубы уже начали сдвигаться'),
+    dict(bg='implant-model.png', out='s6-2.jpg', kind='points',
+         title='Имплант — навсегда',
+         points=['Имплант Osstem —\nот 28 000 ₽',
+                 'Имплант + коронка\nпод ключ — от 45 000 ₽',
+                 'Каждый третий имплант —\nв подарок'],
+         disclaimer=True),
+    dict(bg='implant-cta.png', out='s6-3.jpg', kind='cta',
+         title='Верните полную\nулыбку',
+         sub='Жуйте, смейтесь, живите — без оглядки',
          disclaimer=True),
 ]
 
@@ -178,6 +206,15 @@ def build(slide):
 
     if slide['kind'] == 'cover':
         # бейдж + крупный вопрос + подпись
+        if slide.get('scrim'):
+            # низ фона светлый (одежда/стена) — алебастровый текст тонет;
+            # подкладываем дополнительное тёмное стекло
+            extra = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+            ed = ImageDraw.Draw(extra)
+            for i, yy in enumerate(range(H - 800, H)):
+                a = int(150 * (i / 800) ** 1.1)
+                ed.line((0, yy, W, yy), fill=(10, 42, 40, a))
+            cv.alpha_composite(extra)
         y = H - BOTTOM_FREE - 560
         f_q = prata(92)
         y = multiline(d, 0, y, slide['q'], f_q, ALABASTER, 122, center=cx)
