@@ -460,12 +460,12 @@ a.service-card:hover .service-card__link { color: var(--c-terra-deep); gap: 9px;
   border-bottom: 1px solid var(--c-tint);
 }
 .prices-table tr:last-child td { border-bottom: 0; }
-.prices-table .prices-subhead td { background: var(--c-lagoon); color: #fff; font-weight: 700; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; padding-top: 11px; padding-bottom: 11px; text-align: left !important; white-space: normal !important; border-bottom: 0; }
+.prices-table .prices-subhead td { background: var(--c-bg-soft); color: var(--c-lagoon); font-weight: 700; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; padding-top: 11px; padding-bottom: 11px; text-align: left !important; white-space: normal !important; border-bottom: 0; }
 .prices-table th {
-  background: var(--c-bg-soft);
+  background: var(--c-lagoon);
   font: 600 13px/1.3 var(--font-body);
   letter-spacing: .08em; text-transform: uppercase;
-  color: var(--c-muted);
+  color: #fff;
 }
 .prices-table td:last-child, .prices-table th:last-child {
   text-align: right; white-space: nowrap; font-weight: 600;
