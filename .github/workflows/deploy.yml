@@ -1,0 +1,27 @@
+# Автодеплой на reg.ru: пуш в main или дефолтную ветку → ssh → ~/venecia-dent.sh
+# Требуется секрет REGRU_SSH_PASSWORD (Settings → Secrets and variables → Actions).
+name: Deploy to reg.ru
+on:
+  push:
+    branches: [main, claude/venetia-dental-website-vr6cb6]
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        env:
+          SSHPASS: ${{ secrets.REGRU_SSH_PASSWORD }}
+        run: |
+          if [ -z "$SSHPASS" ]; then
+            echo "::error::Секрет REGRU_SSH_PASSWORD не задан (Settings → Secrets and variables → Actions)"; exit 1
+          fi
+          sudo apt-get install -y -qq sshpass >/dev/null
+          sshpass -e ssh -o StrictHostKeyChecking=accept-new \
+            -o PubkeyAuthentication=no -o PreferredAuthentications=password \
+            u3501870@server292.hosting.reg.ru 'bash ~/venecia-dent.sh'

@@ -346,6 +346,14 @@ Let's Encrypt падал с 404 на `/.well-known/acme-challenge/`. Если
 ⚠️ `.htaccess` гонит на https безусловно — до выпуска сертификата
 на новом домене его деплоить нельзя.
 
+**Автодеплой через GitHub Actions (настроено 10.08.2026):** пуш в `main`
+или в `claude/venetia-dental-website-vr6cb6` запускает
+`.github/workflows/deploy.yml` — раннер GitHub по SSH выполняет
+`~/venecia-dent.sh` на сервере. Пароль SSH — в секрете репозитория
+**`REGRU_SSH_PASSWORD`** (в git НЕ хранить). Из CCR-контейнера прямого
+SSH нет (наружу открыт только 443). Произвольная команда на сервере —
+workflow `server-command.yml` в репо Angel (сервер общий для трёх клиник).
+
 ## Workflow пушей
 
 Разработка — на сессионной ветке (см. инструкции сессии), пуш
