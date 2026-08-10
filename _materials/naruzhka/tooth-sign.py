@@ -118,6 +118,7 @@ print(f'ВЕНЕЦИЯ: кегль {size_u}u, ширина {total/PXMM:.0f} мм
 im.paste(Image.new('RGB', (W, H), (247, 250, 248)), (0, 0), layer)
 os.remove(os.path.join(HERE, '_mask.svg')); os.remove(os.path.join(HERE, '_mask.png'))
 
+im.save(os.path.join(HERE, '_print_raster.png'))
 im.save(os.path.join(HERE, 'venecia-tooth-sign-print.pdf'),
         resolution=DPI, title='Венеция — фигурная вывеска-зуб, печать 1:1')
 im.save(os.path.join(HERE, '_print_flat.png'))
