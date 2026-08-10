@@ -100,8 +100,8 @@ def build(variant, bg_file, headline_lines, offer, out_name):
     pf = onest(275, 800)
     d.text((170, cy + 420), ph, font=pf, fill=LAGOON)
 
-    # ── лицензия (заполнить перед печатью!) ──
-    lic = 'ООО «___________» · Лицензия № ______________ от __.__.20__'
+    # ── юрлицо и лицензия ──
+    lic = 'ООО «АНГЕЛ-ДЕНТ» · ИНН 5012077543 · Лицензия № ЛО41-01162-50/00299266 от 19.07.2016'
     d.text((170, H - 240 - 90), lic, font=onest(56, 500), fill=MUTED)
 
     # ── дисклеймер: полоса ≥5 % площади ──
@@ -112,7 +112,7 @@ def build(variant, bg_file, headline_lines, offer, out_name):
     ww = d.textlength(warn, font=wf)
     d.text(((W - ww) / 2, H - strip_h + (strip_h - 110) / 2 - 10), warn, font=wf, fill=(255, 255, 255))
 
-    im.save(os.path.join(HERE, out_name), quality=95)
+    im.save(os.path.join(HERE, out_name), quality=95, dpi=(300, 300))
     print('built', out_name)
 
 if __name__ == '__main__':
