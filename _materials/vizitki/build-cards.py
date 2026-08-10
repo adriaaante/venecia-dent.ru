@@ -47,29 +47,63 @@ def ctext(d, cx, y, text, font, fill, ls=0):
 def diamond(d, cx, cy, r, fill):
     d.polygon([(cx, cy - r), (cx + r, cy), (cx, cy + r), (cx - r, cy)], fill=fill)
 
-def front(surname, name, role, out):
+def front(surname, name, role, out, frame=True):
     im = Image.new('RGB', (W, H), BG)
     d = ImageDraw.Draw(im)
     cx = W / 2
 
-    # маленький фирменный знак вместо текстовой шапки
+    if frame:
+        fi = BLEED + round(3.2 * MM)
+        d.rectangle([fi, fi, W - fi, H - fi], outline=TINT, width=3)
+
     mark = Image.open(os.path.join(HERE, 'logo-lagoon-mark.png')).convert('RGBA')
-    mh = 96
+    mh = 78
     mw = round(mark.width * mh / mark.height)
     mark = mark.resize((mw, mh), Image.LANCZOS)
-    im.paste(mark, (round(cx - mw / 2), 86), mark)
 
-    # имя врача
-    ctext(d, cx, 226, surname, prata(84), INK)
-    ctext(d, cx, 336, name, prata(46), INK)
+    f_sur, f_nam, f_role = prata(76), prata(44), onest(26, 550)
+    f_ph, f_ad = onest(33, 650), onest(23, 500)
 
-    # разделитель + должность
-    d.line([cx - 56, 424, cx + 56, 424], fill=TERRA, width=3)
-    ctext(d, cx, 444, role.upper(), onest(27, 550), TERRA, ls=6)
+    def th(text, font, ls=0):
+        b = d.textbbox((0, 0), text, font=font)
+        return b[1], b[3] - b[1]  # (смещение до чернил, высота чернил)
 
-    # контакты
-    ctext(d, cx, 500, '+7 (916) 838-08-88', onest(34, 650), LAGOON)
-    ctext(d, cx, 544, 'Мытищи, ул. Мира, 37  ·  venecia-dent.ru', onest(24, 500), MUTED)
+    # элементы и ЧИСТЫЕ визуальные зазоры между чернилами (px)
+    seq = [
+        ('mark', mh),  ('gap', 40),
+        ('sur',  th(surname, f_sur)[1]),   ('gap', 26),
+        ('nam',  th(name, f_nam)[1]),      ('gap', 36),
+        ('line', 3),                        ('gap', 22),
+        ('role', th(role.upper(), f_role)[1]), ('gap', 42),
+        ('ph',   th('+7', f_ph)[1]),       ('gap', 16),
+        ('ad',   th('Мытищи', f_ad)[1]),
+    ]
+    total = sum(hh for _, hh in seq)
+    y = (H - total) / 2 - 6  # оптически чуть выше геометрического центра
+
+    for kind, hh in seq:
+        if kind == 'gap':
+            y += hh; continue
+        if kind == 'mark':
+            im.paste(mark, (round(cx - mw / 2), round(y)), mark)
+        elif kind == 'sur':
+            off, _ = th(surname, f_sur)
+            ctext(d, cx, y - off, surname, f_sur, INK)
+        elif kind == 'nam':
+            off, _ = th(name, f_nam)
+            ctext(d, cx, y - off, name, f_nam, INK)
+        elif kind == 'line':
+            d.line([cx - 56, y + 1, cx + 56, y + 1], fill=TERRA, width=3)
+        elif kind == 'role':
+            off, _ = th(role.upper(), f_role)
+            ctext(d, cx, y - off, role.upper(), f_role, TERRA, ls=6)
+        elif kind == 'ph':
+            off, _ = th('+7 (916) 838-08-88', f_ph)
+            ctext(d, cx, y - off, '+7 (916) 838-08-88', f_ph, LAGOON)
+        elif kind == 'ad':
+            off, _ = th('Мытищи', f_ad)
+            ctext(d, cx, y - off, 'Мытищи, ул. Мира, 37  ·  venecia-dent.ru', f_ad, MUTED)
+        y += hh
 
     im.save(os.path.join(HERE, out), quality=95, dpi=(300, 300))
     print('built', out)
