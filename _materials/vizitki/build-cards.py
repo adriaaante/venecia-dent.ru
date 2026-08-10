@@ -64,19 +64,27 @@ def front(surname, name, role, out, frame=True):
     f_sur, f_nam, f_role = prata(76), prata(44), onest(26, 550)
     f_ph, f_ad = onest(33, 650), onest(23, 500)
 
-    def th(text, font, ls=0):
+    def th(text, font):
         b = d.textbbox((0, 0), text, font=font)
         return b[1], b[3] - b[1]  # (смещение до чернил, высота чернил)
 
-    # элементы и ЧИСТЫЕ визуальные зазоры между чернилами (px)
+    # высоты — по ЭТАЛОННОЙ строке «Ду» (капитель+выносной), а не по
+    # фактической фамилии: иначе карточки разных врачей едут по вертикали
+    sur_off, sur_h = th('Ду', f_sur)
+    nam_off, nam_h = th('Ду', f_nam)
+    role_off, role_h = th('СТ', f_role)
+    ph_off, ph_h = th('+7 (916)', f_ph)
+    ad_off, ad_h = th('Мытищи, 37', f_ad)
+
+    # строгий ритм: G=46 между блоками, g=22 внутри блока (G g G g G g)
     seq = [
-        ('mark', mh),  ('gap', 40),
-        ('sur',  th(surname, f_sur)[1]),   ('gap', 26),
-        ('nam',  th(name, f_nam)[1]),      ('gap', 36),
-        ('line', 3),                        ('gap', 22),
-        ('role', th(role.upper(), f_role)[1]), ('gap', 42),
-        ('ph',   th('+7', f_ph)[1]),       ('gap', 16),
-        ('ad',   th('Мытищи', f_ad)[1]),
+        ('mark', mh),  ('gap', 46),
+        ('sur',  sur_h),  ('gap', 22),
+        ('nam',  nam_h),  ('gap', 46),
+        ('line', 3),      ('gap', 22),
+        ('role', role_h), ('gap', 46),
+        ('ph',   ph_h),   ('gap', 22),
+        ('ad',   ad_h),
     ]
     total = sum(hh for _, hh in seq)
     y = (H - total) / 2 - 6  # оптически чуть выше геометрического центра
@@ -87,22 +95,17 @@ def front(surname, name, role, out, frame=True):
         if kind == 'mark':
             im.paste(mark, (round(cx - mw / 2), round(y)), mark)
         elif kind == 'sur':
-            off, _ = th(surname, f_sur)
-            ctext(d, cx, y - off, surname, f_sur, INK)
+            ctext(d, cx, y - sur_off, surname, f_sur, INK)
         elif kind == 'nam':
-            off, _ = th(name, f_nam)
-            ctext(d, cx, y - off, name, f_nam, INK)
+            ctext(d, cx, y - nam_off, name, f_nam, INK)
         elif kind == 'line':
             d.line([cx - 56, y + 1, cx + 56, y + 1], fill=TERRA, width=3)
         elif kind == 'role':
-            off, _ = th(role.upper(), f_role)
-            ctext(d, cx, y - off, role.upper(), f_role, TERRA, ls=6)
+            ctext(d, cx, y - role_off, role.upper(), f_role, TERRA, ls=6)
         elif kind == 'ph':
-            off, _ = th('+7 (916) 838-08-88', f_ph)
-            ctext(d, cx, y - off, '+7 (916) 838-08-88', f_ph, LAGOON)
+            ctext(d, cx, y - ph_off, '+7 (916) 838-08-88', f_ph, LAGOON)
         elif kind == 'ad':
-            off, _ = th('Мытищи', f_ad)
-            ctext(d, cx, y - off, 'Мытищи, ул. Мира, 37  ·  venecia-dent.ru', f_ad, MUTED)
+            ctext(d, cx, y - ad_off, 'Мытищи, ул. Мира, 37  ·  venecia-dent.ru', f_ad, MUTED)
         y += hh
 
     im.save(os.path.join(HERE, out), quality=95, dpi=(300, 300))
