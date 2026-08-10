@@ -52,25 +52,24 @@ def front(surname, name, role, out):
     d = ImageDraw.Draw(im)
     cx = W / 2
 
-    # тонкая рамка-паспарту (внутри реза на 4 мм)
-    fi = BLEED + round(4 * MM)
-    d.rectangle([fi, fi, W - fi, H - fi], outline=TINT, width=3)
-
-    # шапка: ромбик + имя клиники
-    diamond(d, cx, fi + 34, 9, TERRA)
-    ctext(d, cx, fi + 56, 'СТОМАТОЛОГИЯ ВЕНЕЦИЯ', onest(28, 600), LAGOON, ls=10)
+    # маленький фирменный знак вместо текстовой шапки
+    mark = Image.open(os.path.join(HERE, 'logo-lagoon-mark.png')).convert('RGBA')
+    mh = 96
+    mw = round(mark.width * mh / mark.height)
+    mark = mark.resize((mw, mh), Image.LANCZOS)
+    im.paste(mark, (round(cx - mw / 2), 86), mark)
 
     # имя врача
-    ctext(d, cx, 196, surname, prata(86), INK)
-    ctext(d, cx, 306, name, prata(50), INK)
+    ctext(d, cx, 226, surname, prata(84), INK)
+    ctext(d, cx, 336, name, prata(46), INK)
 
     # разделитель + должность
-    d.line([cx - 70, 396, cx + 70, 396], fill=TERRA, width=3)
-    ctext(d, cx, 414, role.upper(), onest(28, 550), TERRA, ls=6)
+    d.line([cx - 56, 424, cx + 56, 424], fill=TERRA, width=3)
+    ctext(d, cx, 444, role.upper(), onest(27, 550), TERRA, ls=6)
 
     # контакты
-    ctext(d, cx, 464, '+7 (916) 838-08-88', onest(36, 700), LAGOON)
-    ctext(d, cx, 508, 'Мытищи, ул. Мира, 37  ·  venecia-dent.ru', onest(25, 500), MUTED)
+    ctext(d, cx, 500, '+7 (916) 838-08-88', onest(34, 650), LAGOON)
+    ctext(d, cx, 544, 'Мытищи, ул. Мира, 37  ·  venecia-dent.ru', onest(24, 500), MUTED)
 
     im.save(os.path.join(HERE, out), quality=95, dpi=(300, 300))
     print('built', out)
