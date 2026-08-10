@@ -81,14 +81,13 @@ def back(out):
     cx = W / 2
     ALAB = (247, 250, 248)
 
-    # тонкая арка-медальон с ромбом внутри
-    aw, ah = 190, 232
-    ax, ay = cx - aw / 2, 92
-    d.arc([ax, ay, ax + aw, ay + aw], 180, 360, fill=TINT, width=3)
-    d.line([ax, ay + aw / 2, ax, ay + ah], fill=TINT, width=3)
-    d.line([ax + aw, ay + aw / 2, ax + aw, ay + ah], fill=TINT, width=3)
-    d.line([ax, ay + ah, ax + aw, ay + ah], fill=TINT, width=3)
-    diamond(d, cx, ay + ah / 2 + 14, 26, TERRA)
+    # подлинный знак клиники: белый зуб с окном-аркой + терракотовый фонарик
+    mark = Image.open(os.path.join(HERE, 'logo-white-mark.png')).convert('RGBA')
+    mh = 236
+    mw = round(mark.width * mh / mark.height)
+    mark = mark.resize((mw, mh), Image.LANCZOS)
+    ay, ah = 88, 236
+    im.paste(mark, (round(cx - mw / 2), ay), mark)
 
     ctext(d, cx, ay + ah + 42, 'ВЕНЕЦИЯ', prata(66), ALAB, ls=16)
     ctext(d, cx, ay + ah + 138, 'СЕМЕЙНАЯ СТОМАТОЛОГИЯ · МЫТИЩИ', onest(26, 500), TINT, ls=7)
