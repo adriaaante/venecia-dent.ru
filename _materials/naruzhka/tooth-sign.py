@@ -51,18 +51,16 @@ sc = MMU * PXMM  # px на юнит
 # ── печатный макет: алебастровая плита + окно-арка + фонарик + имя ──
 svg_print = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}"
      viewBox="0 0 {W} {H}">
-  <rect width="{W}" height="{H}" fill="{ALAB}"/>
-  <g transform="translate({u2px(0,0)[0] - 0*sc},{u2px(0,0)[1] - 0*sc}) scale({sc}) translate({-0},{-0})">
-  </g>
+  <defs>
+    <linearGradient id="lag" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#12776F"/>
+      <stop offset="1" stop-color="#0A4A46"/>
+    </linearGradient>
+  </defs>
+  <rect width="{W}" height="{H}" fill="url(#lag)"/>
   <g transform="translate({(MARGIN_MM)*PXMM - U_X0*sc},{(MARGIN_MM)*PXMM - U_Y0*sc}) scale({sc})">
-    <defs>
-      <linearGradient id="lag" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#12776F"/>
-        <stop offset="1" stop-color="#0A4A46"/>
-      </linearGradient>
-    </defs>
-    <path d="{ARCH_PATH}" fill="url(#lag)"/>
-    <path d="M256 136 l15 20 -15 20 -15 -20 z" fill="#C75B39"/>
+    <path d="{ARCH_PATH}" fill="{ALAB}"/>
+    <path d="M256 142 l15 20 -15 20 -15 -20 z" fill="#C75B39"/>
   </g>
 </svg>'''
 open(os.path.join(HERE, '_print.svg'), 'w').write(svg_print)
@@ -73,17 +71,52 @@ cairosvg.svg2png(url=os.path.join(HERE, '_print.svg'),
 im = Image.open(os.path.join(HERE, '_print.png')).convert('RGB')
 d = ImageDraw.Draw(im)
 
-# «ВЕНЕЦИЯ» на теле зуба под аркой (Prata, лагуна, с разрядкой)
-f = ImageFont.truetype(os.path.join(FONTS, 'Prata-Regular.ttf'), round(34 * sc))
-text, ls = 'ВЕНЕЦИЯ', round(3 * sc)
-widths = [d.textlength(ch, font=f) for ch in text]
-total = sum(widths) + ls * (len(text) - 1)
-cx_px, y_px = u2px(256, 326)
-b = d.textbbox((0, 0), text, font=f)
-x = cx_px - total / 2
-for ch, w in zip(text, widths):
-    d.text((x, y_px - b[1]), ch, font=f, fill=LAGOON)
-    x += w + ls
+# маска зуба для проверки: текст обязан лежать внутри контура с запасом
+mask_svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}"
+     viewBox="0 0 {W} {H}">
+  <g transform="translate({(MARGIN_MM)*PXMM - U_X0*sc},{(MARGIN_MM)*PXMM - U_Y0*sc}) scale({sc})">
+    <path d="{TOOTH_PATH}" fill="#000"/>
+  </g>
+</svg>'''
+open(os.path.join(HERE, '_mask.svg'), 'w').write(mask_svg)
+cairosvg.svg2png(url=os.path.join(HERE, '_mask.svg'),
+                 write_to=os.path.join(HERE, '_mask.png'),
+                 output_width=W, output_height=H)
+mask = Image.open(os.path.join(HERE, '_mask.png')).split()[3].point(lambda a: 255 if a > 128 else 0)
+
+SAFE_MM = 20  # минимум от букв до линии реза
+safe_px = round(SAFE_MM * PXMM)
+
+# карта расстояний до линии реза: точная попиксельная проверка
+import numpy as np
+from scipy.ndimage import distance_transform_edt
+dist = distance_transform_edt(np.asarray(mask) > 0)
+
+text = 'ВЕНЕЦИЯ'
+size_u = 30
+while size_u >= 16:
+    f = ImageFont.truetype(os.path.join(FONTS, 'Prata-Regular.ttf'), round(size_u * sc))
+    ls = round(size_u / 11 * sc)
+    layer = Image.new('L', (W, H), 0)
+    ld = ImageDraw.Draw(layer)
+    widths = [ld.textlength(ch, font=f) for ch in text]
+    total = sum(widths) + ls * (len(text) - 1)
+    b = ld.textbbox((0, 0), text, font=f)
+    cx_px, y_px = u2px(256, 108)
+    x = cx_px - total / 2
+    for ch, w in zip(text, widths):
+        ld.text((x, y_px - b[1]), ch, font=f, fill=255)
+        x += w + ls
+    ink = np.asarray(layer) > 0
+    min_dist = dist[ink].min() if ink.any() else 0
+    if min_dist >= safe_px:
+        break
+    size_u -= 1
+assert min_dist >= safe_px, 'ВЕНЕЦИЯ не влезает в контур с запасом'
+print(f'ВЕНЕЦИЯ: кегль {size_u}u, ширина {total/PXMM:.0f} мм, '
+      f'мин. запас до реза {min_dist/PXMM:.0f} мм (норма ≥{SAFE_MM})')
+im.paste(Image.new('RGB', (W, H), (247, 250, 248)), (0, 0), layer)
+os.remove(os.path.join(HERE, '_mask.svg')); os.remove(os.path.join(HERE, '_mask.png'))
 
 im.save(os.path.join(HERE, 'venecia-tooth-sign-print.pdf'),
         resolution=DPI, title='Венеция — фигурная вывеска-зуб, печать 1:1')
