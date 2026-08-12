@@ -73,14 +73,17 @@ SCHEMES = {
         title='Терракота',
         body=('#C9603E', '#A84B2F'), text=(247, 250, 248), border=None),
     # ── бело-золотая линия (стиль Версаля) ──
+    # ⚠️ поле у бело-золотых схем — ЧИСТО БЕЛОЕ, без кремового градиента
+    # (владелец, 12.08.2026): на молочном акриле подкрашенный низ читается
+    # как грязь, а с подсветкой — как неравномерная засветка
     'white-gold': dict(
         title='Белый зуб, надпись золотом',
         # золото на белом издалека контрастит слабо, поэтому буквы — глубокий
         # оттенок золота (#A8842F), а не светлый #C2A14E
-        body=('#FFFFFF', '#F6F1E6'), text=(168, 132, 47), border=None),
+        body=('#FFFFFF', '#FFFFFF'), text=(168, 132, 47), border=None),
     'white-gold-edge': dict(
         title='Белый зуб, золотая кайма и надпись',
-        body=('#FFFFFF', '#F6F1E6'), text=(168, 132, 47), border=('#C2A14E', 9)),
+        body=('#FFFFFF', '#FFFFFF'), text=(168, 132, 47), border=('#C2A14E', 9)),
     'gold': dict(
         title='Золотой зуб, надпись эспрессо',
         body=('#DCC07C', '#A8842F'), text=(44, 38, 32), border=None),
@@ -107,18 +110,24 @@ SAFE_PX = round(SAFE_MM * PXMM)
 
 def build(key):
     s = SCHEMES[key]
-    border = ''
-    if s['border']:
-        bc, bw = s['border']
-        # кайма рисуется поверх тела и обрезается маской зуба ниже
-        border = f'<path d="{TOOTH_PATH}" fill="none" stroke="{bc}" stroke-width="{bw * 2}"/>'
-
     im = _render(f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">
   <defs><linearGradient id="b" x1="0" y1="0" x2="0" y2="1">
     <stop offset="0" stop-color="{s['body'][0]}"/><stop offset="1" stop-color="{s['body'][1]}"/>
   </linearGradient></defs>
-  <rect width="{W}" height="{H}" fill="url(#b)"/>
-  <g transform="{G}">{border}</g></svg>''').convert('RGB')
+  <rect width="{W}" height="{H}" fill="url(#b)"/></svg>''').convert('RGB')
+
+    if s['border']:
+        bc, bw = s['border']
+        # Кайма ложится ВНУТРЬ контура: обводка двойной ширины, обрезанная
+        # маской зуба. Иначе её наружная половина уходит за край листа и в
+        # PDF выглядит срезанной — поле листа (MARGIN_MM) это вылет под рез,
+        # а не место под графику.
+        edge = _render(f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">
+  <g transform="{G}"><path d="{TOOTH_PATH}" fill="none" stroke="{bc}"
+     stroke-width="{bw * 2}"/></g></svg>''')
+        inside = Image.new('L', (W, H), 0)
+        inside.paste(edge.split()[3], (0, 0), mask)      # альфа обводки ∩ тело зуба
+        im.paste(Image.new('RGB', (W, H), bc), (0, 0), inside)
 
     # «ВЕНЕЦИЯ» по центру зуба: кегль подбирается так, чтобы буквы не подошли
     # к линии реза ближе, чем SAFE_MM (проверка по карте расстояний).
