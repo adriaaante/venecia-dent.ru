@@ -2,9 +2,9 @@
 """
 Сравнение цветовых схем вывески-зуба НА ЧЁРНОМ ФАСАДЕ (фасад клиники
 чёрный — владелец, 11.08.2026). Два листа:
-  tooth-variants-day.png   — дневной вид (4 схемы на чёрной стене)
-  tooth-variants-night.png — ночной вид (световой короб: светятся арка,
-                             буквы и — у светлых схем — всё тело зуба)
+  tooth-variants-day.png   — дневной вид (все схемы на чёрной стене)
+  tooth-variants-night.png — ночной вид (световой короб: светятся буквы
+                             и — у светлых схем — всё тело зуба)
 Запуск: python3 tooth-sign-variants.py   (после tooth-sign.py)
 """
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
@@ -14,10 +14,13 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 FONTS = os.path.join(HERE, '..', 'buklet', 'fonts')
 
 VARIANTS = [
-    ('alabaster',      'Алебастр (белый зуб)',        'максимальный контраст на чёрном'),
-    ('alabaster-edge', 'Алебастр + лагуновая кайма',  'белый с фирменным контуром'),
-    ('lagoon',         'Лагуна (зелёный зуб)',        'на чёрном фасаде теряется'),
-    ('terracotta',     'Терракота',                   'тёплый акцент, хорошо виден'),
+    ('alabaster',       'Алебастр, надпись лагуной',   'максимальный контраст на чёрном'),
+    ('alabaster-edge',  'Алебастр + лагуновая кайма',  'белый с фирменным контуром'),
+    ('white-gold',      'Белый + золото',              'стиль Версаля, дороже на вид'),
+    ('white-gold-edge', 'Белый + золотая кайма',       'золото читается и днём, и в подсветке'),
+    ('gold',            'Золотой зуб',                 'самый заметный на чёрном фасаде'),
+    ('lagoon',          'Лагуна (зелёный зуб)',        'на чёрном фасаде теряется'),
+    ('terracotta',      'Терракота',                   'тёплый акцент, хорошо виден'),
 ]
 
 def onest(s, w=500):
@@ -25,10 +28,11 @@ def onest(s, w=500):
     f.set_variation_by_axes([w]); return f
 
 def sheet(night, out):
-    COLS, CELL_W, CELL_H = 2, 760, 780
+    COLS, CELL_W, CELL_H = 3, 760, 780
     PAD, TOP = 40, 150
+    ROWS = -(-len(VARIANTS) // COLS)
     W = COLS * CELL_W + PAD * 2
-    H = TOP + 2 * CELL_H + PAD
+    H = TOP + ROWS * CELL_H + PAD
     wall = (14, 14, 16) if not night else (8, 8, 10)
     im = Image.new('RGB', (W, H), wall)
     d = ImageDraw.Draw(im)

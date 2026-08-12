@@ -3,6 +3,11 @@
 Фигурная консольная вывеска-зуб (панель-кронштейн) «Венеция».
 Изделие режется по контуру зуба из логотипа. Высота зуба — 700 мм.
 
+⚠️ Внутри зуба — ТОЛЬКО надпись «ВЕНЕЦИЯ» по центру (решение владельца,
+12.08.2026). Окно-арка и ромб-фонарик из логотипа с вывески убраны:
+на консоли их видно секунду и издалека они читаются как случайный
+«домик со звездой». Не возвращать без явной просьбы.
+
 ⚠️ Фасад клиники ЧЁРНЫЙ (владелец, 11.08.2026) — тёмные варианты зуба на
 нём проваливаются, поэтому собираем несколько цветовых схем и смотрим их
 на чёрной стене (см. tooth-sign-variants.py).
@@ -40,33 +45,45 @@ def u2px(x, y):
 TOOTH_PATH = ("M256 96 c-33 0-51-18-86-18-54 0-84 42-84 96 0 84 41 111 55 178 "
               "8 39 19 60 40 60 31 0 28-80 75-80s44 80 75 80c21 0 32-21 40-60 "
               "14-67 55-94 55-178 0-54-30-96-84-96-35 0-53 18-86 18 z")
-ARCH_PATH = ("M256 192 c-18 16-40 24-40 56 v56 a10 10 0 0 0 10 10 h60 "
-             "a10 10 0 0 0 10-10 v-56 c0-32-22-40-40-56 z")
-LANTERN_PATH = "M256 142 l15 20 -15 20 -15 -20 z"
+
+# центр надписи «ВЕНЕЦИЯ» в юнитах viewBox: по ширине — ось зуба, по высоте —
+# середина коронки (ниже — зуб сужается к корням и буквы пришлось бы мельчить)
+TEXT_CX, TEXT_CY = 256, 228
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 FONTS = os.path.join(HERE, '..', 'buklet', 'fonts')
 
-# ── цветовые схемы (палитра BRAND.md: лагуна/терракота/алебастр) ──
-# body — (верх, низ) градиента тела зуба; arch — цвет окна-арки;
-# lantern — ромб-фонарик; text — «ВЕНЕЦИЯ»; border — кайма по контуру (или None)
+# ── цветовые схемы ─────────────────────────────────────────
+# body — (верх, низ) градиента тела зуба; text — цвет надписи «ВЕНЕЦИЯ»;
+# border — кайма по контуру (цвет, ширина в юнитах) или None.
+# Первые четыре — палитра Венеции (BRAND.md: лагуна/терракота/алебастр),
+# последние три — бело-золотые в стиле «Версаля» (золото #C2A14E,
+# айвори #FCFAF6, эспрессо #2C2620) по просьбе владельца 12.08.2026.
 SCHEMES = {
     'alabaster': dict(
-        title='Алебастр (белый зуб)',
-        body=('#FFFFFF', '#EDF4F1'), arch='#0F6E66', lantern='#C75B39',
-        text=(15, 110, 102), border=None),
+        title='Алебастр, надпись лагуной',
+        body=('#FFFFFF', '#EDF4F1'), text=(15, 110, 102), border=None),
     'alabaster-edge': dict(
         title='Алебастр с лагуновой каймой',
-        body=('#FFFFFF', '#EDF4F1'), arch='#0F6E66', lantern='#C75B39',
-        text=(15, 110, 102), border=('#0F6E66', 9)),   # (цвет, ширина в юнитах)
+        body=('#FFFFFF', '#EDF4F1'), text=(15, 110, 102), border=('#0F6E66', 9)),
     'lagoon': dict(
         title='Лагуна (зелёный зуб)',
-        body=('#12776F', '#0A4A46'), arch='#F7FAF8', lantern='#C75B39',
-        text=(247, 250, 248), border=None),
+        body=('#12776F', '#0A4A46'), text=(247, 250, 248), border=None),
     'terracotta': dict(
         title='Терракота',
-        body=('#C9603E', '#A84B2F'), arch='#F7FAF8', lantern='#0F6E66',
-        text=(247, 250, 248), border=None),
+        body=('#C9603E', '#A84B2F'), text=(247, 250, 248), border=None),
+    # ── бело-золотая линия (стиль Версаля) ──
+    'white-gold': dict(
+        title='Белый зуб, надпись золотом',
+        # золото на белом издалека контрастит слабо, поэтому буквы — глубокий
+        # оттенок золота (#A8842F), а не светлый #C2A14E
+        body=('#FFFFFF', '#F6F1E6'), text=(168, 132, 47), border=None),
+    'white-gold-edge': dict(
+        title='Белый зуб, золотая кайма и надпись',
+        body=('#FFFFFF', '#F6F1E6'), text=(168, 132, 47), border=('#C2A14E', 9)),
+    'gold': dict(
+        title='Золотой зуб, надпись эспрессо',
+        body=('#DCC07C', '#A8842F'), text=(44, 38, 32), border=None),
 }
 
 # ── маска зуба и карта расстояний до реза (одна на все схемы) ──
@@ -101,35 +118,32 @@ def build(key):
     <stop offset="0" stop-color="{s['body'][0]}"/><stop offset="1" stop-color="{s['body'][1]}"/>
   </linearGradient></defs>
   <rect width="{W}" height="{H}" fill="url(#b)"/>
-  <g transform="{G}">
-    {border}
-    <path d="{ARCH_PATH}" fill="{s['arch']}"/>
-    <path d="{LANTERN_PATH}" fill="{s['lantern']}"/>
-  </g></svg>''').convert('RGB')
-    d = ImageDraw.Draw(im)
+  <g transform="{G}">{border}</g></svg>''').convert('RGB')
 
-    # «ВЕНЕЦИЯ» на коронке: кегль подбирается так, чтобы буквы не подошли
-    # к линии реза ближе, чем SAFE_MM (проверка по карте расстояний)
+    # «ВЕНЕЦИЯ» по центру зуба: кегль подбирается так, чтобы буквы не подошли
+    # к линии реза ближе, чем SAFE_MM (проверка по карте расстояний).
+    # Поле пустое — надпись берёт всю ширину коронки и работает как логотип.
     text = 'ВЕНЕЦИЯ'
-    size_u = 30
+    size_u = 56
     while size_u >= 16:
         f = ImageFont.truetype(os.path.join(FONTS, 'Prata-Regular.ttf'), round(size_u * sc))
-        ls = round(size_u / 11 * sc)
+        ls = round(size_u / 9 * sc)                 # разрядка: вывеска читается издалека
         layer = Image.new('L', (W, H), 0)
         ld = ImageDraw.Draw(layer)
         widths = [ld.textlength(ch, font=f) for ch in text]
         total = sum(widths) + ls * (len(text) - 1)
-        b = ld.textbbox((0, 0), text, font=f)
-        cx_px, y_px = u2px(256, 108)
+        b = ld.textbbox((0, 0), text, font=f)       # для точного центрирования по высоте
+        cx_px, cy_px = u2px(TEXT_CX, TEXT_CY)
         x = cx_px - total / 2
+        y = cy_px - (b[1] + b[3]) / 2
         for ch, w_ in zip(text, widths):
-            ld.text((x, y_px - b[1]), ch, font=f, fill=255)
+            ld.text((x, y), ch, font=f, fill=255)
             x += w_ + ls
         ink = np.asarray(layer) > 0
         min_dist = DIST[ink].min() if ink.any() else 0
         if min_dist >= SAFE_PX:
             break
-        size_u -= 1
+        size_u -= 2
     assert min_dist >= SAFE_PX, f'{key}: «ВЕНЕЦИЯ» не влезает в контур с запасом'
     im.paste(Image.new('RGB', (W, H), s['text']), (0, 0), layer)
 
