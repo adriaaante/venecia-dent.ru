@@ -16,7 +16,7 @@
   // ---------------------------------------------------------------------------
   // TODO: заменить на реальный id счётчика Метрики (сейчас placeholder,
   // тот же id — в блоке <!-- Yandex.Metrika counter --> в <head> всех страниц).
-  var YM_COUNTER_ID = 0;
+  var YM_COUNTER_ID = 111523618;
   function trackGoal(name, params) {
     if (typeof window.ym !== 'function' || !YM_COUNTER_ID) return;
     try {

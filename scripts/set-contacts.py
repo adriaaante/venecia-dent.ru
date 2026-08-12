@@ -25,7 +25,7 @@ CURRENT = {
     'phone_display': '+7 (916) 838-08-88',
     'phone_digits': '79168380888',
     'email': 'venecia.1@mail.ru',
-    'metrika': '00000000',
+    'metrika': '111523618',
 }
 
 
