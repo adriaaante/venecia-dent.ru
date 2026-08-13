@@ -34,6 +34,10 @@ SHOTS = [
     ('protez', '09-protez.png', 0.40), ('brekety', '10-brekety.png', 0.40),
     ('elaynery', '11-elaynery.png', 0.40), ('otbelivanie', '12-otbelivanie.png', 0.40),
     ('desny', '13-desny.png', 0.40), ('gigiena', '14-gigiena.png', 0.45),
+    # +6 от 13.08.2026 — добор до 20 (лимит кабинета)
+    ('viniry', '15-viniry.png', 0.38), ('udalenie', '16-udalenie.png', 0.45),
+    ('restavraciya', '17-restavraciya.png', 0.38), ('koronka', '18-koronka.png', 0.38),
+    ('osstem', '19-osstem.png', 0.38), ('semya', '20-semya.png', 0.42),
 ]
 
 
