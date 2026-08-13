@@ -32,21 +32,40 @@ WM_OPACITY, SHADOW_OPACITY = 0.62, 0.38
 BG = (244, 249, 247)       # алебастр — фон для вертикальных портретов
 
 # файл-источник, имя на выходе, режим (cover — заполнить кадр, fit — вписать)
+#
+# Первый кадр публикации — «лицевой»: он показывается крупно в ленте, и
+# по нему человек решает, читать ли текст. Поэтому во главе каждой темы
+# стоит кадр С ЛЮДЬМИ по теме, а интерьеры и макро идут следом
+# (правка 13.08.2026: у семейной программы были одни интерьеры — тема
+# «лечимся семьёй» по картинке не читалась вообще).
+#
+# Кадры с людьми берём из уже собранных материалов кабинета
+# (`_materials/yb-ads/bg`, `yb-promo/bg`) — они сгенерированы в фирменной
+# гамме и согласованы; заново ничего не генерируем.
 SHOTS = [
-    ('assets/img/clinic/clinic-1.webp',            'klinika-1',   'cover'),
-    ('assets/img/clinic/clinic-2.webp',            'klinika-2',   'cover'),
-    ('assets/img/clinic/clinic-3.webp',            'klinika-3',   'cover'),
-    ('assets/img/services/gigiena.webp',           'gigiena-1',   'cover'),
-    ('assets/img/clinic/clinic-4.webp',            'gigiena-2',   'cover'),
-    ('assets/img/doctors/kendabaeva.webp',         'gigiena-3',   'fit'),
-    ('assets/img/clinic/clinic-5.webp',            'semya-1',     'cover'),
-    ('assets/img/clinic/clinic-6.webp',            'semya-2',     'cover'),
-    ('assets/img/services/ortodontiya.webp',       'ortodont-1',  'cover'),
-    ('assets/img/doctors/drobkova.webp',           'ortodont-2',  'fit'),
-    ('assets/img/clinic/clinic-hero.webp',         'vizit-1',     'cover'),
-    ('assets/img/clinic/clinic-about.webp',        'vizit-2',     'cover'),
-    ('assets/img/services/implantaciya.webp',      'implant-1',   'cover'),
-    ('assets/img/services/hirurgiya.webp',         'implant-2',   'cover'),
+    # клиника изнутри — только реальные фото клиники
+    ('assets/img/clinic/clinic-1.webp',              'klinika-1',   'cover'),
+    ('assets/img/clinic/clinic-2.webp',              'klinika-2',   'cover'),
+    ('assets/img/clinic/clinic-3.webp',              'klinika-3',   'cover'),
+    # первый визит — врач показывает план на планшете
+    ('_materials/yb-ads/bg/05-plan.png',             'vizit-1',     'cover'),
+    ('assets/img/clinic/clinic-about.webp',          'vizit-2',     'cover'),
+    # гигиена — гигиенист с пациенткой, процедура, наш врач
+    ('_materials/yb-ads/bg/14-gigiena.png',          'gigiena-1',   'cover'),
+    ('assets/img/services/gigiena.webp',             'gigiena-2',   'cover'),
+    ('assets/img/doctors/kendabaeva.webp',           'gigiena-3',   'fit'),
+    # имплантация — аудитория 50+, затем сама услуга
+    ('_materials/yb-ads/bg/19-osstem.png',           'implant-1',   'cover'),
+    ('assets/img/services/implantaciya.webp',        'implant-2',   'cover'),
+    # семейная программа — семья взрослых и три поколения женщин
+    # (детей в кадре быть не должно: детского приёма в клинике нет)
+    ('_materials/yb-ads/bg/20-semya.png',            'semya-1',     'cover'),
+    ('_materials/yb-promo/bg/promo-family.png',      'semya-2',     'cover'),
+    ('assets/img/clinic/clinic-5.webp',              'semya-3',     'cover'),
+    # ортодонтия — улыбка в брекетах, наш ортодонт, кадр услуги
+    ('_materials/yb-ads/bg/10-brekety.png',          'ortodont-1',  'cover'),
+    ('assets/img/doctors/drobkova.webp',             'ortodont-2',  'fit'),
+    ('assets/img/services/ortodontiya.webp',         'ortodont-3',  'cover'),
 ]
 
 
