@@ -2,27 +2,75 @@
  "title": "Истории (сторис)",
  "items": [
   {
-   "key": "ist1",
+   "key": "s1",
    "title": "Не страшно",
    "btn": "Записаться",
-   "link": "https://venecia-dent.ru/contacts.html",
-   "about": "Про страх боли: спокойный приём, анестезия, всё объясняем заранее.",
+   "link": "https://venecia-dent.ru/",
+   "about": "Страх боли: бережный приём, анестезия, стоп-жест в любой момент.",
    "imgs": [
-    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/b133cb93-3b82-4355-9b2b-a49a2ceff7b4.jpg",
-    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/c680ed3f-62dd-477b-ba39-0a39dc68cbcc.jpg",
-    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/1c64672a-fcf3-4451-8b99-0df29ff77b70.jpg"
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/ddebfb01-2f63-4337-8ea6-366b5756b82f.jpg",
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/f51ee174-5757-4e41-8560-2c7cc3b53625.jpg",
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/6791e793-f413-40cc-9146-bd49f0c6efda.jpg"
    ]
   },
   {
-   "key": "ist2",
+   "key": "s2",
    "title": "Цены честно",
    "btn": "Смотреть цены",
    "link": "https://venecia-dent.ru/ceny.html",
-   "about": "Смета на все услуги до начала лечения, цены фиксируются в договоре.",
+   "about": "Смета на все услуги до начала лечения, без сюрпризов в конце.",
    "imgs": [
-    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/a680c0c7-7ebb-4c25-af84-f46edb7cc59d.jpg",
-    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/ffe77bd8-6bb2-4693-ae26-8a6254377554.jpg",
-    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/5f1b49d0-e75e-4421-9842-b8cbf4246363.jpg"
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/5951f920-e85f-46fe-b501-d238b5cfbaa8.jpg",
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/aa180f27-ba28-41f0-9d41-ca521cd79edd.jpg",
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/609a7f1a-9471-4486-818a-9883dcd418c6.jpg"
+   ]
+  },
+  {
+   "key": "s3",
+   "title": "Для всей семьи",
+   "btn": "Записаться",
+   "link": "https://venecia-dent.ru/promotions.html",
+   "about": "Семейная программа 3–10 %, льготным −10 %, приём ежедневно 10:00–20:00.",
+   "imgs": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/c4448a1d-63cd-4c25-8efd-c806202982cb.jpg",
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/e3ff3ffb-39e1-48e5-8e78-b038a08cf347.jpg",
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/43c1115b-0db6-4c69-b83b-a2dea357f256.jpg"
+   ]
+  },
+  {
+   "key": "s4",
+   "title": "Ровные зубы",
+   "btn": "Записаться",
+   "link": "https://venecia-dent.ru/services/ortodontiya.html",
+   "about": "Оффер: консультация ортодонта 0 ₽ — первый шаг к ровным зубам.",
+   "imgs": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/b4281aa5-641b-4449-b462-304dcefc0822.jpg",
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/4aaf68c7-cf09-4220-b832-09ba74a3b8c1.jpg",
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/459f4430-80c3-42c7-b470-ba4cb15f158f.jpg"
+   ]
+  },
+  {
+   "key": "s5",
+   "title": "Брекеты 30+",
+   "btn": "Записаться",
+   "link": "https://venecia-dent.ru/services/ortodontiya.html",
+   "about": "Миф про возраст: брекеты от 35 000 ₽, элайнеры от 120 000 ₽.",
+   "imgs": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/af4eef0b-4f41-4d60-8bca-a9d6d617a039.jpg",
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/c1b8037d-35eb-4245-90f6-c77077d2b71d.jpg",
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/30fa6d50-229e-4eb2-9900-fef8f7568865.jpg"
+   ]
+  },
+  {
+   "key": "s6",
+   "title": "Имплантация",
+   "btn": "Записаться",
+   "link": "https://venecia-dent.ru/services/implantaciya.html",
+   "about": "Osstem от 28 000 ₽, под ключ от 45 000 ₽, каждый 3-й имплант в подарок.",
+   "imgs": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/8a7847d5-c366-4790-b032-8ba9387360fb.jpg",
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/876103a7-ae69-4af1-a438-c40fd3df4655.jpg",
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/5fdcb461-d38c-4d12-9540-f17d27e15781.jpg"
    ]
   }
  ]
