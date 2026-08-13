@@ -1,0 +1,132 @@
+{
+ "clinic": "Венеция",
+ "city": "Мытищи",
+ "site": "https://venecia-dent.ru",
+ "brand": {
+  "accent": "#0F6E66",
+  "accent2": "#C75B39",
+  "bg": "#F7FAF8",
+  "ink": "#13292A",
+  "line": "#DCE8E3"
+ },
+ "sections": [
+  {
+   "title": "Свои объявления",
+   "note": "Заливать снизу вверх — свежие показываются первыми.",
+   "items": [
+    {
+     "key": "karies",
+     "title": "Лечение кариеса в Мытищах за один визит",
+     "desc": "Пломба за визит, анестезия без боли. Цены фиксируем в договоре.",
+     "price": "5 500 ₽",
+     "link": "https://venecia-dent.ru/services/terapiya.html",
+     "img": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/10c2c84d-2e07-40d7-a84e-fd0dec74f597.jpg"
+    },
+    {
+     "key": "kanaly",
+     "title": "Лечение каналов — сохраняем зуб, а не удаляем",
+     "desc": "Пульпит и периодонтит по рентген-диагностике. Мытищи, ул. Мира, 37.",
+     "price": "7 000 ₽",
+     "link": "https://venecia-dent.ru/services/terapiya.html",
+     "img": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/0d79c379-3bde-4fcf-a8de-5051c1dd6745.jpg"
+    },
+    {
+     "key": "bol",
+     "title": "Болит зуб? Примем сегодня, без выходных",
+     "desc": "Ежедневно 10:00–20:00, Мытищи, ул. Мира, 37. Снимем боль сразу.",
+     "price": "",
+     "link": "https://venecia-dent.ru/contacts.html",
+     "img": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/0406bcb2-12dd-42c3-b014-ce8fb7f3aa81.jpg"
+    },
+    {
+     "key": "mudrosti",
+     "title": "Удаление зуба мудрости в Мытищах",
+     "desc": "Даже сложное: по снимку, с анестезией и планом восстановления.",
+     "price": "9 500 ₽",
+     "link": "https://venecia-dent.ru/services/hirurgiya.html",
+     "img": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/da40be61-7aa7-4fc9-bec2-e67487dba9ed.jpg"
+    },
+    {
+     "key": "plan",
+     "title": "Первый визит: осмотр и план лечения",
+     "desc": "Посмотрим, объясним и посчитаем смету до начала лечения.",
+     "price": "1 000 ₽",
+     "link": "https://venecia-dent.ru/pervyj-vizit.html",
+     "img": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/69f1cfd7-ae98-44bc-848d-c357d8b977a7.jpg"
+    },
+    {
+     "key": "cirkon",
+     "title": "Циркониевая коронка — как свой зуб",
+     "desc": "Прочная, не отличить от родного. Цифровое сканирование без слепков.",
+     "price": "22 000 ₽",
+     "link": "https://venecia-dent.ru/services/protezirovanie.html",
+     "img": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/7d2f6b7a-69ee-4730-99de-fea506045bb4.jpg"
+    },
+    {
+     "key": "implant",
+     "title": "Имплант с коронкой под ключ, Мытищи",
+     "desc": "Фиксированная цена: имплант, абатмент и коронка. Osstem, Dentium.",
+     "price": "45 000 ₽",
+     "link": "https://venecia-dent.ru/services/implantaciya.html",
+     "img": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/3d6e8f3a-462e-4ef3-a135-516c16641f4d.jpg"
+    },
+    {
+     "key": "allon4",
+     "title": "Все зубы на 4 имплантах — за один этап",
+     "desc": "Несъёмный протез вместо съёмного. Вернём жевание и улыбку.",
+     "price": "120 000 ₽",
+     "link": "https://venecia-dent.ru/services/implantaciya.html",
+     "img": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/210fbb04-0880-4115-9305-50cdae21f53a.jpg"
+    },
+    {
+     "key": "protez",
+     "title": "Съёмный протез в Мытищах, ул. Мира, 37",
+     "desc": "Акрил, нейлон или бюгель. Подберём тот, что удобно носить.",
+     "price": "28 000 ₽",
+     "link": "https://venecia-dent.ru/services/protezirovanie.html",
+     "img": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/8f34deab-5edf-41d3-b9c6-9086ed4cdb17.jpg"
+    },
+    {
+     "key": "brekety",
+     "title": "Брекеты взрослым — ровные зубы в любом возрасте",
+     "desc": "И в 30, и в 45. Первичная консультация ортодонта — бесплатно.",
+     "price": "35 000 ₽",
+     "link": "https://venecia-dent.ru/services/ortodontiya.html",
+     "img": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/eb8978b3-ae99-45f3-9c04-9fcd365f389e.jpg"
+    },
+    {
+     "key": "elaynery",
+     "title": "Элайнеры — выравнивание без брекетов",
+     "desc": "Прозрачные капы, незаметны на работе и на встречах.",
+     "price": "120 000 ₽",
+     "link": "https://venecia-dent.ru/services/ortodontiya.html",
+     "img": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/68e3f0e5-c10e-4ac7-bf86-a7e1aec78a1e.jpg"
+    },
+    {
+     "key": "otbelivanie",
+     "title": "Отбеливание Amazing White за один визит",
+     "desc": "Вместо 25 000 ₽. Обе челюсти под ключ, с защитой эмали.",
+     "price": "17 500 ₽",
+     "link": "https://venecia-dent.ru/services/otbelivanie.html",
+     "img": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/4b5bf6af-a35b-47bf-8218-d8c0f71cfeea.jpg"
+    },
+    {
+     "key": "desny",
+     "title": "Кровоточат дёсны? Лечим пародонтит",
+     "desc": "Чистка карманов, Vector-терапия, шинирование. Остановим подвижность.",
+     "price": "",
+     "link": "https://venecia-dent.ru/services/parodontologiya.html",
+     "img": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/d8312c76-8dd2-4905-920a-55f82d47ac76.jpg"
+    },
+    {
+     "key": "gigiena",
+     "title": "Комплексная гигиена: ультразвук и Air Flow",
+     "desc": "Снимем камень и налёт от кофе, чая и сигарет. Полировка включена.",
+     "price": "5 000 ₽",
+     "link": "https://venecia-dent.ru/services/gigiena.html",
+     "img": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/a9082eda-0477-4556-b1e2-e4b5ae637a02.jpg"
+    }
+   ]
+  }
+ ]
+}
