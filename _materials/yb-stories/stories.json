@@ -1,0 +1,29 @@
+{
+ "title": "Истории (сторис)",
+ "items": [
+  {
+   "key": "ist1",
+   "title": "Не страшно",
+   "btn": "Записаться",
+   "link": "https://venecia-dent.ru/contacts.html",
+   "about": "Про страх боли: спокойный приём, анестезия, всё объясняем заранее.",
+   "imgs": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/b133cb93-3b82-4355-9b2b-a49a2ceff7b4.jpg",
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/c680ed3f-62dd-477b-ba39-0a39dc68cbcc.jpg",
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/1c64672a-fcf3-4451-8b99-0df29ff77b70.jpg"
+   ]
+  },
+  {
+   "key": "ist2",
+   "title": "Цены честно",
+   "btn": "Смотреть цены",
+   "link": "https://venecia-dent.ru/ceny.html",
+   "about": "Смета на все услуги до начала лечения, цены фиксируются в договоре.",
+   "imgs": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/a680c0c7-7ebb-4c25-af84-f46edb7cc59d.jpg",
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/ffe77bd8-6bb2-4693-ae26-8a6254377554.jpg",
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3Di09CVa1BatdZIdE0tir1KKUxw/5f1b49d0-e75e-4421-9842-b8cbf4246363.jpg"
+   ]
+  }
+ ]
+}
