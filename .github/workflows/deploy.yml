@@ -1,5 +1,11 @@
 # Автодеплой на reg.ru: пуш в main или дефолтную ветку → ssh → ~/venecia-dent.sh
 # Требуется секрет REGRU_SSH_PASSWORD (Settings → Secrets and variables → Actions).
+#
+# Бот заявок: если задан секрет VENECIA_TG_TOKEN, перед выкаткой на сервере
+# пересоздаётся api/config.php с токеном и chat_id группы. Токен живёт только
+# в секретах GitHub и в файле на сервере — в репозиторий он не попадает, а в
+# логах Actions маскируется. Нет секрета — шаг молча пропускается, сайт
+# выкатывается как обычно (форма при этом заявки не отправляет).
 name: Deploy to reg.ru
 on:
   push:
@@ -10,10 +16,32 @@ concurrency:
   group: deploy
   cancel-in-progress: false
 
+env:
+  SSH_HOST: u3501870@server292.hosting.reg.ru
+  REPO_DIR: ~/venecia-dent.ru
+  TG_CHAT_ID: "-5530724524"      # группа заявок «Венеции»
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Настроить бота заявок
+        env:
+          SSHPASS: ${{ secrets.REGRU_SSH_PASSWORD }}
+          TG_TOKEN: ${{ secrets.VENECIA_TG_TOKEN }}
+        run: |
+          # проверяем секрет в шелле, а не в `if:` — контекст secrets на
+          # уровне шага доступен не везде, а пустой токен затёр бы конфиг
+          if [ -z "$TG_TOKEN" ]; then
+            echo "Секрет VENECIA_TG_TOKEN не задан — конфиг бота не трогаю"; exit 0
+          fi
+          sudo apt-get install -y -qq sshpass >/dev/null
+          printf '<?php\ndefine("TELEGRAM_BOT_TOKEN", "%s");\ndefine("TELEGRAM_CHAT_ID", "%s");\n' \
+            "$TG_TOKEN" "$TG_CHAT_ID" |
+          sshpass -e ssh -o StrictHostKeyChecking=accept-new \
+            -o PubkeyAuthentication=no -o PreferredAuthentications=password \
+            "$SSH_HOST" "cat > $REPO_DIR/api/config.php && chmod 600 $REPO_DIR/api/config.php"
+
       - name: Deploy via SSH
         env:
           SSHPASS: ${{ secrets.REGRU_SSH_PASSWORD }}
@@ -24,4 +52,4 @@ jobs:
           sudo apt-get install -y -qq sshpass >/dev/null
           sshpass -e ssh -o StrictHostKeyChecking=accept-new \
             -o PubkeyAuthentication=no -o PreferredAuthentications=password \
-            u3501870@server292.hosting.reg.ru 'bash ~/venecia-dent.sh'
+            "$SSH_HOST" 'bash ~/venecia-dent.sh'

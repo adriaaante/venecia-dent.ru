@@ -3,6 +3,11 @@
 // На сервере: cp api/config.php.example api/config.php и заполнить значения.
 // api/config.php в .gitignore — в репо не коммитится.
 
-// TODO: токен бота заявок «Венеции» (@BotFather) и chat_id группы заявок.
+// Токен бота заявок «Венеции» — взять у @BotFather.
+// chat_id группы заявок известен: -5530724524 (владелец добавил бота 13.08.2026).
+//
+// На проде этот файл создаётся автоматически: положите токен в секрет
+// репозитория VENECIA_TG_TOKEN, и деплой (.github/workflows/deploy.yml)
+// перезапишет api/config.php на сервере. Руками — только для отладки.
 define('TELEGRAM_BOT_TOKEN', 'PUT-YOUR-BOT-TOKEN-HERE');
-define('TELEGRAM_CHAT_ID',  'PUT-CHAT-ID-HERE');
+define('TELEGRAM_CHAT_ID',  '-5530724524');
