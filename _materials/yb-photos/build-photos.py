@@ -63,15 +63,30 @@ def build_gallery():
     print(f'галерея: {n} фото (1600 px по длинной стороне)')
 
 def build_logo():
-    """Аватар: фирменный знак по центру на алебастровом поле, 1000×1000."""
-    side = 1000
-    im = Image.new('RGB', (side, side), ALAB)
+    """Аватар 1000×1000: фирменная плитка во весь кадр.
+
+    ⚠️ Раньше знак занимал 62% поля и вокруг оставался алебастровый
+    воздух — при загрузке кабинет открывает кадрирование, и владельцу
+    приходилось вручную зумить (решение владельца 13.08.2026: должно
+    вставляться «как есть»). Теперь плитка растянута до краёв, а фон
+    залит той же лагуной, что и она, — скруглённые углы плитки
+    растворяются в фоне, пустого места не остаётся при любом кропе,
+    хоть круглом, хоть квадратном.
+    """
+    side, over = 1000, 1.09        # плитку берём с запасом и режем по кадру
     logo = Image.open(LOGO).convert('RGBA')
-    s = round(side * 0.62)
-    logo = logo.resize((s, s), Image.LANCZOS)
-    im.paste(logo, ((side - s) // 2, (side - s) // 2), logo)
-    im.save(os.path.join(OUT, 'logo-1000.jpg'), quality=95, subsampling=0)
-    print('логотип: 1000×1000')
+    logo = logo.crop(logo.split()[3].getbbox())
+
+    big = round(side * over)
+    logo = logo.resize((big, big), Image.LANCZOS)
+    off = (big - side) // 2
+    # скруглённые углы плитки уходят за границы кадра — в углах остаётся
+    # чистый градиент лагуны, а не стык фона с плиткой
+    im = Image.new('RGB', (big, big), logo.convert('RGB').getpixel((big // 2, 12)))
+    im.paste(logo, (0, 0), logo)
+    im.crop((off, off, off + side, off + side)) \
+      .save(os.path.join(OUT, 'logo-1000.jpg'), quality=95, subsampling=0)
+    print('логотип: 1000×1000, плитка во весь кадр без полей')
 
 def build_cover():
     """Обложка профиля 1200×400 — широкий кроп самого «просторного» кадра."""
