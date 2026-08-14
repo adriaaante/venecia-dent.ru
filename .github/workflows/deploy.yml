@@ -1,11 +1,14 @@
 # Автодеплой на reg.ru: пуш в main или дефолтную ветку → ssh → ~/venecia-dent.sh
 # Требуется секрет REGRU_SSH_PASSWORD (Settings → Secrets and variables → Actions).
 #
-# Бот заявок: если задан секрет VENECIA_TG_TOKEN, перед выкаткой на сервере
-# пересоздаётся api/config.php с токеном и chat_id группы. Токен живёт только
-# в секретах GitHub и в файле на сервере — в репозиторий он не попадает, а в
-# логах Actions маскируется. Нет секрета — шаг молча пропускается, сайт
-# выкатывается как обычно (форма при этом заявки не отправляет).
+# Бот заявок ОБЩИЙ у трёх клиник (владелец, 13.08.2026) — отличаются только
+# группы. Поэтому конфиг «Венеции» собирается на сервере из токена, который
+# уже лежит в конфиге «Ангела»: токен не покидает хостинг, в git и в логи
+# Actions не попадает. Если когда-нибудь понадобится отдельный бот — задайте
+# секрет VENECIA_TG_TOKEN, он имеет приоритет.
+#
+# Шаг идемпотентный: рабочий конфиг не трогаем, пишем только если его нет
+# или в нём заглушка.
 name: Deploy to reg.ru
 on:
   push:
@@ -18,7 +21,6 @@ concurrency:
 
 env:
   SSH_HOST: u3501870@server292.hosting.reg.ru
-  REPO_DIR: ~/venecia-dent.ru
   TG_CHAT_ID: "-5530724524"      # группа заявок «Венеции»
 
 jobs:
@@ -30,25 +32,42 @@ jobs:
           SSHPASS: ${{ secrets.REGRU_SSH_PASSWORD }}
           TG_TOKEN: ${{ secrets.VENECIA_TG_TOKEN }}
         run: |
-          # проверяем секрет в шелле, а не в `if:` — контекст secrets на
-          # уровне шага доступен не везде, а пустой токен затёр бы конфиг
-          if [ -z "$TG_TOKEN" ]; then
-            echo "Секрет VENECIA_TG_TOKEN не задан — конфиг бота не трогаю"; exit 0
+          if [ -z "$SSHPASS" ]; then
+            echo "::error::Секрет REGRU_SSH_PASSWORD не задан"; exit 1
           fi
           sudo apt-get install -y -qq sshpass >/dev/null
-          printf '<?php\ndefine("TELEGRAM_BOT_TOKEN", "%s");\ndefine("TELEGRAM_CHAT_ID", "%s");\n' \
-            "$TG_TOKEN" "$TG_CHAT_ID" |
+          # Токен ищем на сервере (общий бот) и печатаем только длину —
+          # само значение в лог не выводим ни при каком исходе.
+          REMOTE='
+            V=$HOME/venecia-dent.ru/api/config.php
+            if [ -s "$V" ] && grep -q "[0-9]\{6,\}:" "$V"; then
+              echo "конфиг заявок уже настроен — не трогаю"; exit 0
+            fi
+            t="$TG_TOKEN_REMOTE"
+            if [ -z "$t" ]; then
+              t=$(grep -hoE "[0-9]{6,}:[A-Za-z0-9_-]{20,}" \
+                    $HOME/Angel-Dent-site/api/config.php \
+                    $HOME/Angel-Dent-site/scripts/.deploy.env 2>/dev/null | head -1)
+            fi
+            if [ -z "$t" ]; then
+              echo "::error::Токен бота не найден: нет ни секрета VENECIA_TG_TOKEN, ни конфига Ангела"; exit 1
+            fi
+            { echo "<?php"
+              echo "define(\"TELEGRAM_BOT_TOKEN\", \"$t\");"
+              echo "define(\"TELEGRAM_CHAT_ID\", \"CHAT_ID_PLACEHOLDER\");"
+            } > "$V"
+            chmod 600 "$V"
+            php -l "$V" >/dev/null && echo "конфиг заявок записан, длина токена ${#t}"
+          '
+          REMOTE=${REMOTE//CHAT_ID_PLACEHOLDER/$TG_CHAT_ID}
           sshpass -e ssh -o StrictHostKeyChecking=accept-new \
             -o PubkeyAuthentication=no -o PreferredAuthentications=password \
-            "$SSH_HOST" "cat > $REPO_DIR/api/config.php && chmod 600 $REPO_DIR/api/config.php"
+            "$SSH_HOST" "TG_TOKEN_REMOTE='$TG_TOKEN' bash -s" <<< "$REMOTE"
 
       - name: Deploy via SSH
         env:
           SSHPASS: ${{ secrets.REGRU_SSH_PASSWORD }}
         run: |
-          if [ -z "$SSHPASS" ]; then
-            echo "::error::Секрет REGRU_SSH_PASSWORD не задан (Settings → Secrets and variables → Actions)"; exit 1
-          fi
           sudo apt-get install -y -qq sshpass >/dev/null
           sshpass -e ssh -o StrictHostKeyChecking=accept-new \
             -o PubkeyAuthentication=no -o PreferredAuthentications=password \
