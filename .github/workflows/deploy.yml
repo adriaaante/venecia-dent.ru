@@ -7,8 +7,9 @@
 # Actions не попадает. Если когда-нибудь понадобится отдельный бот — задайте
 # секрет VENECIA_TG_TOKEN, он имеет приоритет.
 #
-# Шаг идемпотентный: рабочий конфиг не трогаем, пишем только если его нет
-# или в нём заглушка.
+# Шаг идемпотентный: конфиг переписывается, только если в нём нет токена
+# или указана не та группа. Канал проверен 14.08.2026 — тестовая заявка с
+# сайта дошла в группу «Венеция - записи».
 name: Deploy to reg.ru
 on:
   push:
@@ -64,34 +65,6 @@ jobs:
           sshpass -e ssh -o StrictHostKeyChecking=accept-new \
             -o PubkeyAuthentication=no -o PreferredAuthentications=password \
             "$SSH_HOST" "TG_TOKEN_REMOTE='$TG_TOKEN' bash -s" <<< "$REMOTE"
-
-      # Временная диагностика канала заявок: почему Telegram не принимает
-      # сообщение. Печатаем только код ответа и описание ошибки — токен и
-      # тело запроса в лог не попадают. Убрать, когда заявки поедут.
-      - name: Диагностика заявок
-        env:
-          SSHPASS: ${{ secrets.REGRU_SSH_PASSWORD }}
-        run: |
-          sudo apt-get install -y -qq sshpass >/dev/null
-          REMOTE='
-            t=$(grep -oE "[0-9]{6,}:[A-Za-z0-9_-]{20,}" $HOME/venecia-dent.ru/api/config.php | head -1)
-            for id in CHAT_ID_PLACEHOLDER -100CHAT_ID_DIGITS; do
-              echo "-- getChat $id:"
-              curl -s -m 15 "https://api.telegram.org/bot$t/getChat?chat_id=$id" | head -c 200; echo
-            done
-            echo "-- webhook (если задан, getUpdates не работает):"
-            curl -s -m 15 "https://api.telegram.org/bot$t/getWebhookInfo" | head -c 200; echo
-            echo "-- какие чаты бот видит (id, тип, название):"
-            u=$(curl -s -m 20 "https://api.telegram.org/bot$t/getUpdates?limit=50")
-            echo "$u" | head -c 120; echo
-            echo "$u" | grep -oE "\"chat\":\{\"id\":-?[0-9]+,\"title\":\"[^\"]*\",\"type\":\"[^\"]*\"" |
-              sed "s/\"chat\":{//" | sort -u
-          '
-          REMOTE=${REMOTE//CHAT_ID_PLACEHOLDER/$TG_CHAT_ID}
-          REMOTE=${REMOTE//CHAT_ID_DIGITS/${TG_CHAT_ID#-}}
-          sshpass -e ssh -o StrictHostKeyChecking=accept-new \
-            -o PubkeyAuthentication=no -o PreferredAuthentications=password \
-            "$SSH_HOST" "bash -s" <<< "$REMOTE"
 
       - name: Deploy via SSH
         env:
