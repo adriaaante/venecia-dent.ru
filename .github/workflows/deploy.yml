@@ -40,8 +40,9 @@ jobs:
           # само значение в лог не выводим ни при каком исходе.
           REMOTE='
             V=$HOME/venecia-dent.ru/api/config.php
-            if [ -s "$V" ] && grep -q "[0-9]\{6,\}:" "$V"; then
-              echo "конфиг заявок уже настроен — не трогаю"; exit 0
+            if [ -s "$V" ] && grep -q "[0-9]\{6,\}:" "$V" \
+               && grep -q "CHAT_ID_PLACEHOLDER" "$V"; then
+              echo "конфиг заявок уже настроен на нужную группу — не трогаю"; exit 0
             fi
             t="$TG_TOKEN_REMOTE"
             if [ -z "$t" ]; then
@@ -78,9 +79,12 @@ jobs:
               echo "-- getChat $id:"
               curl -s -m 15 "https://api.telegram.org/bot$t/getChat?chat_id=$id" | head -c 200; echo
             done
+            echo "-- webhook (если задан, getUpdates не работает):"
+            curl -s -m 15 "https://api.telegram.org/bot$t/getWebhookInfo" | head -c 200; echo
             echo "-- какие чаты бот видит (id, тип, название):"
-            curl -s -m 20 "https://api.telegram.org/bot$t/getUpdates?limit=50" |
-              grep -oE "\"chat\":\{\"id\":-?[0-9]+,\"title\":\"[^\"]*\",\"type\":\"[^\"]*\"" |
+            u=$(curl -s -m 20 "https://api.telegram.org/bot$t/getUpdates?limit=50")
+            echo "$u" | head -c 120; echo
+            echo "$u" | grep -oE "\"chat\":\{\"id\":-?[0-9]+,\"title\":\"[^\"]*\",\"type\":\"[^\"]*\"" |
               sed "s/\"chat\":{//" | sort -u
           '
           REMOTE=${REMOTE//CHAT_ID_PLACEHOLDER/$TG_CHAT_ID}
