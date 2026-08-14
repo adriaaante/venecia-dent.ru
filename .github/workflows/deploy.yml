@@ -64,6 +64,29 @@ jobs:
             -o PubkeyAuthentication=no -o PreferredAuthentications=password \
             "$SSH_HOST" "TG_TOKEN_REMOTE='$TG_TOKEN' bash -s" <<< "$REMOTE"
 
+      # Временная диагностика канала заявок: почему Telegram не принимает
+      # сообщение. Печатаем только код ответа и описание ошибки — токен и
+      # тело запроса в лог не попадают. Убрать, когда заявки поедут.
+      - name: Диагностика заявок
+        env:
+          SSHPASS: ${{ secrets.REGRU_SSH_PASSWORD }}
+        run: |
+          sudo apt-get install -y -qq sshpass >/dev/null
+          REMOTE='
+            t=$(grep -oE "[0-9]{6,}:[A-Za-z0-9_-]{20,}" $HOME/venecia-dent.ru/api/config.php | head -1)
+            echo "-- getMe:"
+            curl -s -m 15 "https://api.telegram.org/bot$t/getMe" | head -c 300; echo
+            echo "-- getChat CHAT_ID_PLACEHOLDER:"
+            curl -s -m 15 "https://api.telegram.org/bot$t/getChat?chat_id=CHAT_ID_PLACEHOLDER" | head -c 300; echo
+            echo "-- прямой sendMessage:"
+            curl -s -m 15 -X POST "https://api.telegram.org/bot$t/sendMessage" \
+              -d chat_id=CHAT_ID_PLACEHOLDER -d text="Проверка канала заявок Венеции" | head -c 300; echo
+          '
+          REMOTE=${REMOTE//CHAT_ID_PLACEHOLDER/$TG_CHAT_ID}
+          sshpass -e ssh -o StrictHostKeyChecking=accept-new \
+            -o PubkeyAuthentication=no -o PreferredAuthentications=password \
+            "$SSH_HOST" "bash -s" <<< "$REMOTE"
+
       - name: Deploy via SSH
         env:
           SSHPASS: ${{ secrets.REGRU_SSH_PASSWORD }}
