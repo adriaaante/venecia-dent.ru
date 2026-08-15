@@ -968,6 +968,10 @@ a.doctor-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md);
 .pf-tag { background: var(--c-bg-soft); color: var(--c-lagoon); font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 100px; }
 .pf-meta { display: flex; gap: 14px; flex-wrap: wrap; color: var(--c-muted); font-size: 13px; padding-top: 6px; border-top: 1px dashed var(--c-tint); }
 .pf-meta__item { display: inline-flex; align-items: center; gap: 4px; }
+/* Кейс проиллюстрирован типичной картиной, а не фото пациента: говорим
+   об этом на самой карточке — честнее, чем сноской под всем разделом. */
+.pf-meta__item--illu { padding: 2px 8px; border: 1px dashed currentColor;
+  border-radius: 999px; opacity: .8; font-size: .92em; }
 .pf-empty { text-align: center; padding: 40px 20px; background: #fff; border: 1px dashed var(--c-tint); border-radius: var(--radius-lg); color: var(--c-muted); grid-column: 1 / -1; }
 .pf-empty svg { color: rgba(15,110,102,.45); margin: 0 auto 12px; display: block; }
 .pf-empty p { max-width: 460px; margin: 0 auto; font-size: 14.5px; }
