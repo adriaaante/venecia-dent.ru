@@ -385,6 +385,10 @@ window.AD_PORTFOLIO = {
     // по методике — говорим об этом прямо на карточке, а не мелким шрифтом
     // под всем разделом.
     if (item.illustrative) meta.push('<span class="pf-meta__item pf-meta__item--illu">Иллюстрация методики</span>');
+    // Работа осталась в клинике, а врач, который её делал, уже не
+    // принимает: кейс передан действующему врачу направления, но
+    // авторство лично ему не приписываем.
+    if (item.clinicWork) meta.push('<span class="pf-meta__item pf-meta__item--illu">Работа клиники</span>');
 
     return (
       '<article class="pf-card" data-pf-index="' + idx + '">' +
@@ -481,6 +485,7 @@ window.AD_PORTFOLIO = {
       var metaParts = [];
       if (item.date) metaParts.push('<span class="pf-meta__item">📅 ' + escapeHTML(item.date) + '</span>');
       if (item.illustrative) metaParts.push('<span class="pf-meta__item pf-meta__item--illu">Иллюстрация методики</span>');
+      if (item.clinicWork) metaParts.push('<span class="pf-meta__item pf-meta__item--illu">Работа клиники</span>');
       if (metaParts.length) {
         metaWrap.innerHTML = metaParts.join('');
         metaWrap.hidden = false;
