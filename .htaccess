@@ -28,9 +28,10 @@ ErrorDocument 404 /404.html
 # изображения — 30 дней, html — 1 час.
 <IfModule mod_expires.c>
     ExpiresActive On
-    # ⚠️ JS и CSS — БЕЗ длинного кеша (было 7 дней): правка скрипта не
-    # доезжала до вернувшегося посетителя, у него оставались старое
-    # портфолио и старое меню. Ниже стоит обязательная перепроверка.
+    # ⚠️ JS и CSS. На reg.ru эти директивы НЕ срабатывают: статику
+    # отдаёт nginx перед Apache и ставит свои 45 дней (проверено
+    # 15.08.2026). Оставлены на случай переезда; реальное средство —
+    # хеш в ссылке, scripts/asset-version.py.
     ExpiresByType text/css                "access plus 0 seconds"
     ExpiresByType application/javascript  "access plus 0 seconds"
     ExpiresByType text/javascript         "access plus 0 seconds"
