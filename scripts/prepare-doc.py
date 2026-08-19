@@ -24,6 +24,7 @@
 краям (убрать стол, пальцы, тёмную рамку).
 """
 import argparse
+import html
 import json
 import re
 import sys
@@ -36,6 +37,7 @@ OUT = ROOT / 'assets' / 'img' / 'docs'
 ORIG = OUT / '_originals'
 FULL_MAX = 1500
 THUMB_W = 420
+THUMB_H = 315   # 4:3 — единая посадка карточек в ряду
 
 
 def build_images(src: Path, key: str, rotate: int, crop: str, enhance: bool):
@@ -55,8 +57,13 @@ def build_images(src: Path, key: str, rotate: int, crop: str, enhance: bool):
 
     full = im.copy()
     full.thumbnail((FULL_MAX, FULL_MAX), Image.LANCZOS)
-    thumb = im.copy()
-    thumb.thumbnail((THUMB_W, THUMB_W * 4), Image.LANCZOS)
+    # Миниатюры приводим к одному кадру 4:3 на белом: документы бывают и
+    # альбомные, и книжные, а в ряду карточек они должны стоять ровно.
+    # Именно вписываем, а не обрезаем — документ должен читаться целиком.
+    thumb = ImageOps.contain(im.copy(), (THUMB_W, THUMB_H), Image.LANCZOS)
+    canvas = Image.new('RGB', (THUMB_W, THUMB_H), (255, 255, 255))
+    canvas.paste(thumb, ((THUMB_W - thumb.width) // 2, (THUMB_H - thumb.height) // 2))
+    thumb = canvas
 
     OUT.mkdir(parents=True, exist_ok=True)
     ORIG.mkdir(parents=True, exist_ok=True)
@@ -69,6 +76,7 @@ def build_images(src: Path, key: str, rotate: int, crop: str, enhance: bool):
 
 def card_html(key: str, caption: str, size) -> str:
     w, h = size
+    caption = html.escape(caption, quote=True)
     return (f'<li><a class="doc" data-doc href="../assets/img/docs/{key}.webp" '
             f'target="_blank" rel="noopener" data-doc-caption="{caption}">'
             f'<span class="doc__frame"><img loading="lazy" decoding="async" '
@@ -87,11 +95,23 @@ def put_on_page(page: Path, key: str, html: str, heading: str) -> None:
                        '', inner, flags=re.S)
         s = s[:block.start()] + f'<ul class="docs" data-docs>{inner}{html}</ul>' + s[block.end():]
     else:
-        anchor = re.search(r'(<h2>Документы и квалификация</h2><ul>.*?</ul>)', s, re.S)
-        if not anchor:
-            sys.exit(f'{page.name}: нет блока «Документы и квалификация» — добавьте его вручную')
-        s = (s[:anchor.end()] + f'<h3 class="docs__title">{heading}</h3>'
-             f'<ul class="docs" data-docs>{html}</ul>' + s[anchor.end():])
+        # Ставим галерею после блоков квалификации, а если их нет (у врача
+        # ещё не подтверждены данные) — перед списком услуг, чтобы сканы
+        # всё равно оказались в осмысленном месте страницы.
+        anchor = None
+        for pat in (r'(<h2>Документы и квалификация</h2><ul>.*?</ul>)',
+                    r'(<h2>Образование</h2><ul>.*?</ul>)'):
+            anchor = re.search(pat, s, re.S)
+            if anchor:
+                pos = anchor.end()
+                break
+        else:
+            svc = re.search(r'<h2>Услуги, которые ведёт врач</h2>', s)
+            if not svc:
+                sys.exit(f'{page.name}: не нашёл, куда вставить галерею документов')
+            pos = svc.start()
+        s = (s[:pos] + f'<h2>{heading}</h2>'
+             f'<ul class="docs" data-docs>{html}</ul>' + s[pos:])
     page.write_text(s, encoding='utf-8')
 
 
