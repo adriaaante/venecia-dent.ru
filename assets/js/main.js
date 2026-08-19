@@ -310,3 +310,61 @@
 
   } // init
 })();
+
+/* ============================================================
+   Просмотр документов врача (дипломы, сертификаты)
+   ------------------------------------------------------------
+   На странице лежит только миниатюра (lazy, ~20 КБ) — полный скан
+   грузится ТОЛЬКО по клику, поэтому вес страницы и Core Web Vitals
+   не страдают: для поисковика это по-прежнему лёгкая страница.
+   Без JS ссылка просто открывает скан в новой вкладке.
+   ============================================================ */
+(function () {
+  var box = null;
+
+  function close() {
+    if (!box) return;
+    box.classList.remove('is-open');
+    document.body.style.overflow = '';
+    setTimeout(function () { if (box) { box.remove(); box = null; } }, 180);
+  }
+
+  function open(href, caption) {
+    close();
+    box = document.createElement('div');
+    box.className = 'docview';
+    box.setAttribute('role', 'dialog');
+    box.setAttribute('aria-modal', 'true');
+    box.setAttribute('aria-label', caption || 'Документ врача');
+    box.innerHTML =
+      '<div class="docview__box">' +
+        '<button class="docview__close" type="button" aria-label="Закрыть">&times;</button>' +
+        '<img src="' + href + '" alt="' + (caption || 'Документ врача') + '">' +
+        '<div class="docview__bar">' +
+          '<span class="docview__cap"></span>' +
+          '<a class="docview__open" href="' + href + '" target="_blank" rel="noopener">Открыть в новой вкладке</a>' +
+        '</div>' +
+      '</div>';
+    box.querySelector('.docview__cap').textContent = caption || '';
+    document.body.appendChild(box);
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(function () { box.classList.add('is-open'); });
+
+    box.addEventListener('click', function (e) {
+      if (e.target === box || e.target.closest('.docview__close')) { e.preventDefault(); close(); }
+    });
+  }
+
+  document.addEventListener('click', function (e) {
+    var link = e.target.closest ? e.target.closest('[data-doc]') : null;
+    if (!link) return;
+    // Ctrl/Cmd/средняя кнопка — пусть работает штатное открытие в новой вкладке
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    open(link.getAttribute('href'), link.getAttribute('data-doc-caption') || '');
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') close();
+  });
+})();

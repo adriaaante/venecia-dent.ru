@@ -1036,3 +1036,51 @@ a.doctor-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md);
   .pf-lightbox__close { top: 8px; right: 10px; width: 40px; height: 40px; font-size: 26px; }
   .pf-shots { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* === Документы врача (дипломы, сертификаты) ==========================
+   Единый формат для трёх клиник: светлая карточка-рамка, миниатюра
+   внутри. На странице только миниатюра (lazy, с width/height — без
+   скачков вёрстки), полный скан подгружается по клику. Цвета берём из
+   токенов темы, поэтому блок сам подстраивается под каждый сайт. */
+.docs { list-style: none; margin: 18px 0 0; padding: 0;
+  display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+.doc { display: block; text-decoration: none; color: inherit; }
+.doc__frame { background: #fff; padding: 8px; border-radius: 12px;
+  border: 1px solid var(--c-border, var(--c-tint, #e6e6e6));
+  box-shadow: 0 2px 10px rgba(0,0,0,.05);
+  transition: transform .16s ease, box-shadow .16s ease; }
+.doc:hover .doc__frame, .doc:focus-visible .doc__frame {
+  transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,.11); }
+.doc img { display: block; width: 100%; height: auto; border-radius: 8px; }
+.doc__cap { display: block; margin-top: 8px; font-size: 14px; line-height: 1.4;
+  color: var(--c-text-muted, var(--c-muted, #667)); }
+.doc__hint { display: block; margin-top: 2px; font-size: 12.5px;
+  color: var(--c-accent, var(--c-terra, var(--c-lagoon, #888))); }
+
+/* Просмотрщик: светлый лист по центру, документ целиком, без обрезки */
+/* Выше cookie-баннера (9000) и всех липких панелей — иначе документ
+   открывается, а нижняя часть просмотрщика уезжает под баннер. */
+.docview { position: fixed; inset: 0; z-index: 9500; display: flex;
+  align-items: center; justify-content: center; padding: 20px;
+  background: rgba(24, 22, 20, .74); opacity: 0; transition: opacity .18s ease; }
+.docview.is-open { opacity: 1; }
+.docview__box { position: relative; background: #fff; border-radius: 14px;
+  padding: 14px; max-width: min(1080px, 94vw); max-height: 94vh;
+  display: flex; flex-direction: column; gap: 10px;
+  box-shadow: 0 24px 60px rgba(0,0,0,.35); }
+.docview__box img { max-width: 100%; max-height: 78vh; width: auto; height: auto;
+  margin: 0 auto; display: block; border-radius: 8px; object-fit: contain; }
+.docview__bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  justify-content: space-between; }
+.docview__cap { font-size: 14px; line-height: 1.4; color: var(--c-text, #23282e); }
+.docview__open { font-size: 14px; text-decoration: underline;
+  color: var(--c-accent-dark, var(--c-terra-deep, var(--c-lagoon, #55606b))); }
+.docview__close { position: absolute; top: -14px; right: -14px; width: 38px; height: 38px;
+  border: 0; border-radius: 50%; background: #fff; color: #333; font-size: 26px;
+  line-height: 36px; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.28); }
+@media (max-width: 640px) {
+  .docs { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+  .docview { padding: 12px; }
+  .docview__box { padding: 10px; max-width: 96vw; }
+  .docview__close { top: -10px; right: -6px; width: 34px; height: 34px; line-height: 32px; }
+}
