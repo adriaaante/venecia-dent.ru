@@ -36,11 +36,16 @@ def clean(src: str) -> str:
     def repl(m: re.Match) -> str:
         title, inner = m.group(1), m.group(2)
         kept = [li for li in LI.findall(inner) if '<!--' not in li]
-        dropped_comments = ''.join(re.findall(r'<!--.*?-->', inner, re.S))
+        # ⚠️ Только ТЕКСТ подсказок, без «<!--»/«-->»: вложенные комментарии
+        # в HTML невалидны — первый внутренний «-->» закрывает внешний, и
+        # хвост «-->» вылезает на страницу видимым текстом (баг 19.08.2026).
+        hints = [re.sub(r'\s+', ' ', t).strip(' .').replace('TODO:', '').replace('--', '—').strip()
+                 for t in re.findall(r'<!--((?:(?!-->).)*?)-->', inner, re.S)]
+        hint_tail = (' Подсказки: ' + '; '.join(h for h in hints if h) + '.') if any(hints) else ''
         if not kept:
             # Блок целиком без подтверждения — убираем вместе с заголовком,
             # подсказки прячем в комментарий, чтобы не потерять контекст.
-            return f'\n  <!-- {title}: данных, подтверждённых документами, пока нет. {dropped_comments} -->'
+            return f'\n  <!-- {title}: данных, подтверждённых документами, пока нет.{hint_tail} -->'
         name = 'Документы и квалификация' if title != 'Образование' else title
         return f'\n  <h2>{name}</h2><ul>{"".join(kept)}</ul>'
     return BLOCK.sub(repl, src)
