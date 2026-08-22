@@ -1079,7 +1079,14 @@ a.doctor-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md);
   border: 0; border-radius: 50%; background: #fff; color: #333; font-size: 26px;
   line-height: 36px; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.28); }
 @media (max-width: 640px) {
-  .docs { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+  /* На телефоне — горизонтальная лента вместо двух рядов: экономит
+     ~половину высоты. Чистый CSS (scroll-snap), документы остаются в
+     DOM — для поисковика ничего не меняется. Ширина карточки 44%, чтобы
+     следующая выглядывала краем — видно, что ленту можно листать. */
+  .docs { display: flex; overflow-x: auto; gap: 12px; padding-bottom: 8px;
+    scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin; }
+  .docs > li { flex: 0 0 44%; scroll-snap-align: start; }
   .docview { padding: 12px; }
   .docview__box { padding: 10px; max-width: 96vw; }
   .docview__close { top: -10px; right: -6px; width: 34px; height: 34px; line-height: 32px; }
