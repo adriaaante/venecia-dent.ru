@@ -82,8 +82,7 @@ def card_html(key: str, caption: str, size) -> str:
             f'<span class="doc__frame"><img loading="lazy" decoding="async" '
             f'width="{w}" height="{h}" src="../assets/img/docs/{key}-thumb.webp" '
             f'alt="{caption}"></span>'
-            f'<span class="doc__cap">{caption}</span>'
-            f'<span class="doc__hint">Нажмите, чтобы посмотреть</span></a></li>')
+            f'<span class="doc__cap">{caption}</span></a></li>')
 
 
 def put_on_page(page: Path, key: str, html: str, heading: str) -> None:

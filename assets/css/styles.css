@@ -1045,7 +1045,10 @@ a.doctor-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md);
 .docs { list-style: none; margin: 18px 0 0; padding: 0;
   display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
 .doc { display: block; text-decoration: none; color: inherit; }
-.doc__frame { background: #fff; padding: 8px; border-radius: 12px;
+/* display:block обязателен: это <span>, и строчный контейнер с блочной
+   картинкой внутри фрагментируется — его отступы рисовались пустыми
+   белыми полосками над карточками (баг, замечен владельцем 22.08.2026) */
+.doc__frame { display: block; background: #fff; padding: 8px; border-radius: 12px;
   border: 1px solid var(--c-border, var(--c-tint, #e6e6e6));
   box-shadow: 0 2px 10px rgba(0,0,0,.05);
   transition: transform .16s ease, box-shadow .16s ease; }
@@ -1054,8 +1057,6 @@ a.doctor-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md);
 .doc img { display: block; width: 100%; height: auto; border-radius: 8px; }
 .doc__cap { display: block; margin-top: 8px; font-size: 14px; line-height: 1.4;
   color: var(--c-text-muted, var(--c-muted, #667)); }
-.doc__hint { display: block; margin-top: 2px; font-size: 12.5px;
-  color: var(--c-accent, var(--c-terra, var(--c-lagoon, #888))); }
 
 /* Просмотрщик: светлый лист по центру, документ целиком, без обрезки */
 /* Выше cookie-баннера (9000) и всех липких панелей — иначе документ
