@@ -36,8 +36,13 @@ REPO = HERE.parent.parent
 OUT = HERE / "out"
 FONTS = REPO / "_materials" / "buklet" / "fonts"
 
-# Куда ведёт код: отзывы в карточке Яндекс.Бизнеса (id организации — CLAUDE.md).
-REVIEW_URL = "https://yandex.ru/profile/104110939502/reviews"
+# Куда ведёт код: отзывы в карточке организации на Яндекс.Картах, сразу с
+# открытой формой отзыва (add-review=true).
+# ⚠️ Короткая форма /profile/<id>/reviews НЕ РАБОТАЕТ — Яндекс отдаёт на ней
+# 404 (проверено 24.08.2026, на этом и погорела прежняя табличка). Сам
+# /profile/<id> живой, но подстраницы отзывов у него больше нет — ссылку на
+# отзывы берём только в виде /maps/org/<слаг>/<id>/reviews/.
+REVIEW_URL = "https://yandex.ru/maps/org/venetsiya/104110939502/reviews/?add-review=true"
 
 # Фирменные цвета (BRAND.md).
 LAGOON = (15, 110, 102)
@@ -220,6 +225,26 @@ def build_card(w_mm: float, h_mm: float) -> Image.Image:
     return card.resize((W // SS, H // SS), Image.LANCZOS)
 
 
+def url_alive() -> str:
+    """Проверка, что ссылка не отдаёт 404 (см. комментарий у REVIEW_URL).
+
+    Без сети шаг молча пропускается — сборка не должна падать оттого, что
+    в окружении нет интернета.
+    """
+    import urllib.request
+    import urllib.error
+    req = urllib.request.Request(REVIEW_URL, headers={
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                      "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"})
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            return "ok" if r.status == 200 else f"код ответа {r.status}"
+    except urllib.error.HTTPError as e:
+        return f"страница отдаёт {e.code}"
+    except Exception:
+        return "пропущено (нет сети)"
+
+
 def decodes(img: Image.Image) -> str:
     """Читаемость кода: то же, что делает камера телефона."""
     import numpy as np
@@ -253,6 +278,11 @@ def main(argv: list[str]) -> int:
         print(f"QR не читается или ведёт не туда: {got!r}", file=sys.stderr)
         return 1
     print(f"[✓] код читается: {got}")
+    alive = url_alive()
+    if alive.startswith("страница отдаёт") or alive.startswith("код ответа"):
+        print(f"[!] ссылка нерабочая: {alive}", file=sys.stderr)
+        return 1
+    print(f"[✓] ссылка открывается: {alive}")
 
     if a.check:
         for f in sorted(OUT.glob("*")):
