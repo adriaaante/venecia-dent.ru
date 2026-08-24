@@ -6,3 +6,6 @@ api/config.php
 Thumbs.db
 *.pyc
 __pycache__/
+
+# контактный лист сторожа ориентации сканов — служебный, в git не нужен
+assets/img/docs/_originals/_orientation-sheet.png
