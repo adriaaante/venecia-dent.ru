@@ -61,21 +61,52 @@
     document.addEventListener('DOMContentLoaded', init);
   } else {
 
-  // Документы врача: первые 8 на виду, остальные — по кнопке. Так блок не
-  // превращается в стену сканов, а страница не тянет два десятка миниатюр.
+  // Документы врача: на сетке оставляем две полные строки, остальное — под
+  // кнопкой. Сколько карточек в строке, считаем по вёрстке, а не угадываем:
+  // сетка auto-fill, колонок от ширины экрана. На телефоне документы идут
+  // горизонтальной лентой — там все карточки в одной «строке», значит
+  // прятать нечего, и кнопка не появляется.
   document.querySelectorAll('[data-docs]').forEach(function (list) {
-    var total = list.children.length;
-    if (total <= 8) return;
-    list.classList.add('docs--collapsed');
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'docs-more';
-    btn.textContent = 'Показать все документы (' + total + ')';
-    btn.addEventListener('click', function () {
-      list.classList.remove('docs--collapsed');
-      btn.remove();
+    var items = Array.prototype.slice.call(list.children);
+    if (items.length < 10) return;
+    var btn = null;
+    var opened = false;
+
+    function expand() {
+      items.forEach(function (li) { li.hidden = false; });
+      if (btn) { btn.remove(); btn = null; }
+    }
+
+    function ensureButton() {
+      if (btn) return;
+      btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'docs-more';
+      btn.textContent = 'Показать все документы (' + items.length + ')';
+      btn.addEventListener('click', function () { opened = true; expand(); });
+      list.parentNode.insertBefore(btn, list.nextSibling);
+    }
+
+    function layout() {
+      if (opened) return;
+      var top = null, perRow = 0;
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].hidden) continue;
+        if (top === null) top = items[i].offsetTop;
+        if (items[i].offsetTop === top) perRow++; else break;
+      }
+      var keep = perRow * 2;
+      if (!perRow || keep >= items.length) { expand(); return; }
+      items.forEach(function (li, j) { li.hidden = j >= keep; });
+      ensureButton();
+    }
+
+    layout();
+    var t;
+    window.addEventListener('resize', function () {
+      clearTimeout(t);
+      t = setTimeout(layout, 200);
     });
-    list.parentNode.insertBefore(btn, list.nextSibling);
   });
 
     init();
