@@ -1092,3 +1092,13 @@ a.doctor-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md);
   .docview__box { padding: 10px; max-width: 96vw; }
   .docview__close { top: -10px; right: -6px; width: 34px; height: 34px; line-height: 32px; }
 }
+
+/* Документы врача: показываем первые 8, остальные раскрываются кнопкой.
+   Класс вешает JS — без него в разметке видны все документы, поэтому
+   поисковик получает полный список, а браузер не тянет лишние
+   миниатюры (скрытые display:none lazy-картинки не загружаются). */
+.docs--collapsed > li:nth-child(n+9) { display: none; }
+.docs-more { display: block; margin: 16px auto 0; padding: 10px 22px;
+  border: 1px solid rgba(0,0,0,.18); border-radius: 999px; background: #fff;
+  font: inherit; font-weight: 600; color: inherit; cursor: pointer; }
+.docs-more:hover { background: rgba(0,0,0,.04); }

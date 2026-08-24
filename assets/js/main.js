@@ -60,6 +60,24 @@
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
+
+  // Документы врача: первые 8 на виду, остальные — по кнопке. Так блок не
+  // превращается в стену сканов, а страница не тянет два десятка миниатюр.
+  document.querySelectorAll('[data-docs]').forEach(function (list) {
+    var total = list.children.length;
+    if (total <= 8) return;
+    list.classList.add('docs--collapsed');
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'docs-more';
+    btn.textContent = 'Показать все документы (' + total + ')';
+    btn.addEventListener('click', function () {
+      list.classList.remove('docs--collapsed');
+      btn.remove();
+    });
+    list.parentNode.insertBefore(btn, list.nextSibling);
+  });
+
     init();
   }
 
