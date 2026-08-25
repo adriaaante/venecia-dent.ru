@@ -1105,3 +1105,11 @@ a.doctor-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md);
   transition: background .15s ease, border-color .15s ease; }
 .docs-more:hover { background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.28); }
 .docs-more:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+
+/* Услуга с отдельной страницей кликабельна прямо из прайса: пунктирное
+   подчёркивание отличает ссылку от обычной строки, цвет остаётся текстовым,
+   чтобы таблица не пестрила. */
+.prices-table td a { color: inherit; text-decoration: underline;
+  text-decoration-style: dotted; text-decoration-thickness: 1px;
+  text-underline-offset: 3px; }
+.prices-table td a:hover { text-decoration-style: solid; }
