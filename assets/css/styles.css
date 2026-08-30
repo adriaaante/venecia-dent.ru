@@ -1112,3 +1112,6 @@ a.doctor-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md);
    при наведении. */
 .prices-table td a { text-decoration: none; font-weight: 600; }
 .prices-table td a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Длинные e-mail и адреса ведомств (legal.html) не должны распирать узкий экран */
+.prose a[href^="mailto:"], .prose a[href^="http"] { overflow-wrap: anywhere; }
