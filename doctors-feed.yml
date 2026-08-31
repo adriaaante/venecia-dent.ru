@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<shop version="2.0" date="2026-08-31 19:23">
+<shop version="2.0" date="2026-08-31 19:41">
   <name>Венеция</name>
   <company>ООО «АНГЕЛ-ДЕНТ»</company>
   <url>https://venecia-dent.ru/</url>
@@ -24,6 +24,15 @@
       <picture>https://venecia-dent.ru/assets/img/doctors/kilasoniya.png</picture>
       <description>Стоматолог-хирург, терапевт. Удаление зубов любой сложности, зубосохраняющие операции, лечение кариеса.</description>
     </doctor>
+    <doctor id="kendabaeva">
+      <name>Кендабаева Зухро Бурхоновна</name>
+      <url>https://venecia-dent.ru/doctors/kendabaeva.html</url>
+      <surname>Кендабаева</surname>
+      <first_name>Зухро</first_name>
+      <patronymic>Бурхоновна</patronymic>
+      <picture>https://venecia-dent.ru/assets/img/doctors/kendabaeva.png</picture>
+      <description>Гигиенист стоматологический. Профессиональная гигиена полости рта, чистка Air Flow, фторирование.</description>
+    </doctor>
   </doctors>
   <clinics>
     <clinic id="clinic">
@@ -43,6 +52,9 @@
     </service>
     <service id="konsultaciya">
       <name>Консультация стоматолога с планом лечения</name>
+    </service>
+    <service id="gigiena">
+      <name>Комплексная гигиена (ультразвук + Air Flow + полировка)</name>
     </service>
   </services>
   <offers>
@@ -80,6 +92,27 @@
       <clinic id="clinic">
         <doctor id="kilasoniya">
           <speciality>стоматолог-хирург</speciality>
+          <adult_appointment>true</adult_appointment>
+          <children_appointment>false</children_appointment>
+          <house_call>false</house_call>
+          <telemed>false</telemed>
+          <is_base_service>true</is_base_service>
+        </doctor>
+      </clinic>
+    </offer>
+    <offer id="kendabaeva-gigiena">
+      <url>https://venecia-dent.ru/doctors/kendabaeva.html</url>
+      <online_schedule>false</online_schedule>
+      <oms>false</oms>
+      <appointment>true</appointment>
+      <price>
+        <base_price>5000</base_price>
+        <currency>RUR</currency>
+      </price>
+      <service id="gigiena" />
+      <clinic id="clinic">
+        <doctor id="kendabaeva">
+          <speciality>стоматолог-гигиенист</speciality>
           <adult_appointment>true</adult_appointment>
           <children_appointment>false</children_appointment>
           <house_call>false</house_call>
