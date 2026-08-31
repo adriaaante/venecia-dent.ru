@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shop version="2.0" date="2026-08-31 19:23">
+  <name>Венеция</name>
+  <company>ООО «АНГЕЛ-ДЕНТ»</company>
+  <url>https://venecia-dent.ru/</url>
+  <picture>https://venecia-dent.ru/assets/img/logo.png</picture>
+  <email>venecia.1@mail.ru</email>
+  <doctors>
+    <doctor id="drobkova">
+      <name>Дробкова Кристина Олеговна</name>
+      <url>https://venecia-dent.ru/doctors/drobkova.html</url>
+      <surname>Дробкова</surname>
+      <first_name>Кристина</first_name>
+      <patronymic>Олеговна</patronymic>
+      <picture>https://venecia-dent.ru/assets/img/doctors/drobkova.png</picture>
+      <description>Стоматолог-ортодонт. Брекеты, элайнеры, исправление прикуса у взрослых и подростков.</description>
+    </doctor>
+    <doctor id="kilasoniya">
+      <name>Киласония Шорена Гиулиевна</name>
+      <url>https://venecia-dent.ru/doctors/kilasoniya.html</url>
+      <surname>Киласония</surname>
+      <first_name>Шорена</first_name>
+      <patronymic>Гиулиевна</patronymic>
+      <picture>https://venecia-dent.ru/assets/img/doctors/kilasoniya.png</picture>
+      <description>Стоматолог-хирург, терапевт. Удаление зубов любой сложности, зубосохраняющие операции, лечение кариеса.</description>
+    </doctor>
+  </doctors>
+  <clinics>
+    <clinic id="clinic">
+      <name>Стоматология «Венеция»</name>
+      <url>https://venecia-dent.ru/</url>
+      <picture>https://venecia-dent.ru/assets/img/logo.png</picture>
+      <city>г. Мытищи</city>
+      <address>Московская область, г. Мытищи, ул. Мира, д. 37</address>
+      <email>venecia.1@mail.ru</email>
+      <phone>+79168380888</phone>
+      <company_id>104110939502</company_id>
+    </clinic>
+  </clinics>
+  <services>
+    <service id="konsultaciya-ortodonta">
+      <name>Первичная консультация ортодонта</name>
+    </service>
+    <service id="konsultaciya">
+      <name>Консультация стоматолога с планом лечения</name>
+    </service>
+  </services>
+  <offers>
+    <offer id="drobkova-konsultaciya-ortodonta">
+      <url>https://venecia-dent.ru/doctors/drobkova.html</url>
+      <online_schedule>false</online_schedule>
+      <oms>false</oms>
+      <appointment>true</appointment>
+      <price>
+        <base_price>0</base_price>
+        <currency>RUR</currency>
+      </price>
+      <service id="konsultaciya-ortodonta" />
+      <clinic id="clinic">
+        <doctor id="drobkova">
+          <speciality>стоматолог-ортодонт</speciality>
+          <adult_appointment>true</adult_appointment>
+          <children_appointment>false</children_appointment>
+          <house_call>false</house_call>
+          <telemed>false</telemed>
+          <is_base_service>true</is_base_service>
+        </doctor>
+      </clinic>
+    </offer>
+    <offer id="kilasoniya-konsultaciya">
+      <url>https://venecia-dent.ru/doctors/kilasoniya.html</url>
+      <online_schedule>false</online_schedule>
+      <oms>false</oms>
+      <appointment>true</appointment>
+      <price>
+        <base_price>1000</base_price>
+        <currency>RUR</currency>
+      </price>
+      <service id="konsultaciya" />
+      <clinic id="clinic">
+        <doctor id="kilasoniya">
+          <speciality>стоматолог-хирург</speciality>
+          <adult_appointment>true</adult_appointment>
+          <children_appointment>false</children_appointment>
+          <house_call>false</house_call>
+          <telemed>false</telemed>
+          <is_base_service>true</is_base_service>
+        </doctor>
+      </clinic>
+    </offer>
+  </offers>
+</shop>
