@@ -36,6 +36,11 @@ def main(argv: list[str]) -> int:
         (fp, fsize), (tp, tsize) = pd.build_images(src, src.stem, 0, '', False)
         print(f'  ✓ {src.stem:38} {fsize[0]}×{fsize[1]} + миниатюра {tsize[0]}×{tsize[1]}')
     print(f'пересобрано документов: {len(originals)}')
+    # ссылки на сканы несут хеш файла (кеш reg.ru на месяц) — обновляем
+    spec_v = importlib.util.spec_from_file_location('docs_version', ROOT / 'scripts' / 'docs-version.py')
+    dv = importlib.util.module_from_spec(spec_v)
+    spec_v.loader.exec_module(dv)
+    dv.main([])
     return 0
 
 
