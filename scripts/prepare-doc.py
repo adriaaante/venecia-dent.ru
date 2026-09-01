@@ -50,10 +50,10 @@ THUMB_H = 315   # 4:3 — единая посадка карточек в ряд
 WM_PATH = ROOT / 'assets' / 'img' / 'watermark.png'
 WM_MODE = 'plate'      # знак Венеции — плотная плашка, перекрашивать нечего: ставим как есть, но мельче
 WM_BRAND = (15, 110, 102)      # лагуна #0F6E66 (в режиме plate не используется)
-WM_RATIO = 0.1      # сторона знака как доля короткой стороны скана
+WM_RATIO = 0.115     # сторона знака как доля короткой стороны скана
 WM_MARGIN = 0.032       # отступ от края — тоже от короткой стороны
-WM_OPACITY_DARK = 0.34  # тёмный знак на светлом документе
-WM_OPACITY_LIGHT = 0.50 # белый знак на тёмном (бывают чёрные сертификаты)
+WM_OPACITY_DARK = 0.60  # тёмный знак на светлом документе
+WM_OPACITY_LIGHT = 0.65 # белый знак на тёмном (бывают чёрные сертификаты)
 
 
 def _busy(im: Image.Image, box) -> float:
@@ -98,6 +98,7 @@ def stamp(im: Image.Image) -> Image.Image:
         base, (corners[c][0], corners[c][1], corners[c][0] + w, corners[c][1] + h)))]
 
     scaled = wm.resize((w, h), Image.LANCZOS)
+    out = base.copy()
     if WM_MODE == 'plate':
         mark = scaled.copy()
         mark.putalpha(scaled.split()[3].point(lambda p: int(p * WM_OPACITY_LIGHT)))
@@ -106,10 +107,20 @@ def stamp(im: Image.Image) -> Image.Image:
         on_light = lum > 120
         color = WM_BRAND if on_light else (255, 255, 255)
         op = WM_OPACITY_DARK if on_light else WM_OPACITY_LIGHT
+        # Мягкая подсветка противоположного цвета под знаком: дипломы почти
+        # сплошь в цветных гильоширных узорах, и без неё знак тонет в них
+        # (владелец, 01.09.2026 — «при открытии полного документа лого не
+        # видно»). Подсветка размыта и полупрозрачна, узор сквозь неё
+        # читается, а знак получает ровное поле под собой.
+        halo_color = (255, 255, 255) if on_light else (25, 25, 25)
+        halo = Image.new('RGBA', (w, h), halo_color + (255,))
+        halo.putalpha(scaled.split()[3].point(lambda p: int(p * 0.85)))
+        glow = Image.new('RGBA', base.size, (0, 0, 0, 0))
+        glow.alpha_composite(halo, (x, y))
+        out.alpha_composite(glow.filter(ImageFilter.GaussianBlur(max(3, w // 10))))
         mark = Image.new('RGBA', (w, h), color + (255,))
         mark.putalpha(scaled.split()[3].point(lambda p: int(p * op)))
 
-    out = base.copy()
     out.alpha_composite(mark, (x, y))
     return out.convert('RGB')
 
