@@ -30,7 +30,7 @@ import re
 import sys
 from pathlib import Path
 
-from PIL import Image, ImageOps
+from PIL import Image, ImageFilter, ImageOps
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / 'assets' / 'img' / 'docs'
@@ -38,6 +38,80 @@ ORIG = OUT / '_originals'
 FULL_MAX = 1500
 THUMB_W = 420
 THUMB_H = 315   # 4:3 — единая посадка карточек в ряду
+
+
+# ── Знак клиники на сканах документов (владелец, 01.09.2026) ──────────────
+# Документы врачей — такой же контент клиники, как фото портфолио: без
+# знака их легко утащить на чужой сайт. Но документ должен ЧИТАТЬСЯ, это
+# его главная задача, поэтому знак маленький, полупрозрачный и в углу.
+#
+# Оригиналы в `_originals/` остаются ЧИСТЫМИ: знак накладывается уже после
+# их сохранения, поэтому повторный прогон не наслаивает его второй раз.
+WM_PATH = ROOT / 'assets' / 'img' / 'watermark.png'
+WM_MODE = 'plate'      # знак Венеции — плотная плашка, перекрашивать нечего: ставим как есть, но мельче
+WM_BRAND = (15, 110, 102)      # лагуна #0F6E66 (в режиме plate не используется)
+WM_RATIO = 0.1      # сторона знака как доля короткой стороны скана
+WM_MARGIN = 0.032       # отступ от края — тоже от короткой стороны
+WM_OPACITY_DARK = 0.34  # тёмный знак на светлом документе
+WM_OPACITY_LIGHT = 0.50 # белый знак на тёмном (бывают чёрные сертификаты)
+
+
+def _busy(im: Image.Image, box) -> float:
+    """Насколько «занят» угол: больше перепадов яркости — хуже для знака."""
+    import numpy as np
+    a = np.asarray(im.convert('L').crop(box), dtype=float)
+    if a.size == 0:
+        return 1e9
+    gx = np.abs(np.diff(a, axis=1)).mean() if a.shape[1] > 1 else 0
+    gy = np.abs(np.diff(a, axis=0)).mean() if a.shape[0] > 1 else 0
+    return gx + gy + a.std() * 0.15
+
+
+def stamp(im: Image.Image) -> Image.Image:
+    """Знак клиники в правом углу — в тот, который свободнее.
+
+    Угол выбирается по картинке, а не жёстко: у дипломов верх занят гербом
+    и шапкой, у сертификатов низ — подписями и логотипами организаторов.
+    Ставить всегда в один угол значило бы регулярно накрывать чужой
+    логотип или подпись.
+
+    Режим `tint` (Ангел, Версаль): знак перекрашивается в один фирменный
+    цвет и ставится как классический водяной знак. Родной знак этих клиник
+    светлый и тонкий — на белой бумаге он просто растворялся. На тёмных
+    сертификатах (бывают чёрные) знак автоматически становится белым.
+
+    Режим `plate` (Венеция): её знак — плотная плашка, у которой почти нет
+    прозрачного фона, перекрашивать нечего. Ставим саму плашку, но мельче.
+    """
+    import numpy as np
+    if not WM_PATH.is_file():
+        return im
+    wm = Image.open(WM_PATH).convert('RGBA')
+    base = im.convert('RGBA')
+    short = min(base.width, base.height)
+    w = int(short * WM_RATIO)
+    h = int(wm.height * w / wm.width)
+    m = int(short * WM_MARGIN)
+    corners = {'br': (base.width - w - m, base.height - h - m),
+                'tr': (base.width - w - m, m)}
+    x, y = corners[min(corners, key=lambda c: _busy(
+        base, (corners[c][0], corners[c][1], corners[c][0] + w, corners[c][1] + h)))]
+
+    scaled = wm.resize((w, h), Image.LANCZOS)
+    if WM_MODE == 'plate':
+        mark = scaled.copy()
+        mark.putalpha(scaled.split()[3].point(lambda p: int(p * WM_OPACITY_LIGHT)))
+    else:
+        lum = np.asarray(base.convert('L').crop((x, y, x + w, y + h)), dtype=float).mean()
+        on_light = lum > 120
+        color = WM_BRAND if on_light else (255, 255, 255)
+        op = WM_OPACITY_DARK if on_light else WM_OPACITY_LIGHT
+        mark = Image.new('RGBA', (w, h), color + (255,))
+        mark.putalpha(scaled.split()[3].point(lambda p: int(p * op)))
+
+    out = base.copy()
+    out.alpha_composite(mark, (x, y))
+    return out.convert('RGB')
 
 
 def build_images(src: Path, key: str, rotate: int, crop: str, enhance: bool):
@@ -55,6 +129,11 @@ def build_images(src: Path, key: str, rotate: int, crop: str, enhance: bool):
         # чтобы бумага читалась белой и карточки выглядели однообразно.
         im = ImageOps.autocontrast(im, cutoff=(0.5, 0.6))
 
+    OUT.mkdir(parents=True, exist_ok=True)
+    ORIG.mkdir(parents=True, exist_ok=True)
+    im.save(ORIG / f'{key}.webp', 'WEBP', quality=90, method=4)   # оригинал БЕЗ знака
+
+    im = stamp(im)
     full = im.copy()
     full.thumbnail((FULL_MAX, FULL_MAX), Image.LANCZOS)
     # Миниатюры приводим к одному кадру 4:3 на белом: документы бывают и
@@ -65,12 +144,9 @@ def build_images(src: Path, key: str, rotate: int, crop: str, enhance: bool):
     canvas.paste(thumb, ((THUMB_W - thumb.width) // 2, (THUMB_H - thumb.height) // 2))
     thumb = canvas
 
-    OUT.mkdir(parents=True, exist_ok=True)
-    ORIG.mkdir(parents=True, exist_ok=True)
     f_path, t_path = OUT / f'{key}.webp', OUT / f'{key}-thumb.webp'
     full.save(f_path, 'WEBP', quality=72, method=6)
     thumb.save(t_path, 'WEBP', quality=70, method=6)
-    im.save(ORIG / f'{key}.webp', 'WEBP', quality=90, method=4)
     return (f_path, full.size), (t_path, thumb.size)
 
 
