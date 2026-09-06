@@ -137,5 +137,5 @@ def back(out):
 if __name__ == '__main__':
     front('Дробкова', 'Кристина Олеговна', 'Стоматолог-ортодонт', 'card-drobkova-front.jpg')
     front('Киласония', 'Шорена Гиулиевна', 'Стоматолог-хирург · терапевт', 'card-kilasoniya-front.jpg')
-    front('Кендабаева', 'Зухро Бурхоновна', 'Стоматолог-гигиенист', 'card-kendabaeva-front.jpg')
+    front('Кенжабаева', 'Зухро Бурхоновна', 'Стоматолог-гигиенист', 'card-kendabaeva-front.jpg')
     back('card-back.jpg')

@@ -23,6 +23,14 @@
     python3 scripts/docs-orientation-check.py --no-sheet # без картинки
 
 Код возврата 1 — если что-то лежит боком.
+
+⚠️ Метрика ошибается на РАЗВОРОТАХ дипломов: когда одна половина кадра —
+плотная таблица оценок или пустой лист, «строчность» по вертикали
+перевешивает, и правильно стоящий скан помечается как лежащий боком.
+Такие сканы, проверенные глазами, вносятся по одному в файл
+`assets/img/docs/_originals/_orientation-ok.txt` (одна строка — имя скана
+без расширения, `#` — комментарий). Вносить туда скан можно ТОЛЬКО после
+того, как посмотрел на него сам.
 """
 from __future__ import annotations
 
@@ -35,6 +43,15 @@ from PIL import Image, ImageDraw
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / 'assets' / 'img' / 'docs'
 SHEET = DOCS / '_originals' / '_orientation-sheet.png'
+VERIFIED = DOCS / '_originals' / '_orientation-ok.txt'
+
+
+def read_verified() -> set[str]:
+    """Сканы, которые метрика ругает зря — проверены глазами (см. docstring)."""
+    if not VERIFIED.exists():
+        return set()
+    return {ln.split('#')[0].strip() for ln in VERIFIED.read_text(encoding='utf-8').splitlines()
+            if ln.split('#')[0].strip()}
 
 
 def text_axis_score(im: Image.Image) -> float:
@@ -84,6 +101,7 @@ def main(argv: list[str]) -> int:
     if not files:
         print('сканов нет'); return 0
 
+    verified = read_verified()
     sideways = []
     items = []
     for f in files:
@@ -91,7 +109,7 @@ def main(argv: list[str]) -> int:
         now = text_axis_score(im)
         turned = text_axis_score(im.rotate(90, expand=True))
         items.append((f.stem, f))
-        if turned > now:
+        if turned > now and f.stem not in verified:
             sideways.append((f.stem, now, turned))
 
     print(f'проверено сканов: {len(files)}')
