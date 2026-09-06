@@ -17,6 +17,16 @@ ErrorDocument 404 /404.html
     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 </IfModule>
 
+# --- 301-редиректы со старых адресов ---
+# Файл деплоится из репозитория (переживает rsync --delete). Цель: адрес,
+# уже попавший в индекс, не отдаёт 404 (теряя накопленный вес), а постоянным
+# редиректом передаёт его новой странице.
+<IfModule mod_alias.c>
+    # slug гигиениста переименован 06.09.2026: фамилия по документу — Кенжабаева
+    RedirectMatch 301 ^/doctors/kendabaeva\.html$            /doctors/kenzhabaeva.html
+    RedirectMatch 301 ^/assets/img/(doctors|docs|portfolio)/kendabaeva(-[a-z0-9-]+)?\.(webp|png)$  /assets/img/$1/kenzhabaeva$2.$3
+</IfModule>
+
 # --- Сжатие (gzip) ---
 <IfModule mod_deflate.c>
     AddOutputFilterByType DEFLATE text/html text/css text/xml application/xml \

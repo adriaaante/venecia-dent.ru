@@ -53,7 +53,7 @@ SHOTS = [
     # гигиена — гигиенист с пациенткой, процедура, наш врач
     ('_materials/yb-ads/bg/14-gigiena.png',          'gigiena-1',   'cover'),
     ('assets/img/services/gigiena.webp',             'gigiena-2',   'cover'),
-    ('assets/img/doctors/kendabaeva.webp',           'gigiena-3',   'fit'),
+    ('assets/img/doctors/kenzhabaeva.webp',           'gigiena-3',   'fit'),
     # имплантация — аудитория 50+, затем сама услуга
     ('_materials/yb-ads/bg/19-osstem.png',           'implant-1',   'cover'),
     ('assets/img/services/implantaciya.webp',        'implant-2',   'cover'),
